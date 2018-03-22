@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Application xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:infra="clr-namespace:Lands.Infrastructure;assembly=Lands"
+             x:Class="Lands.App">
+    
+	<Application.Resources>
+
+		<!-- Application resource dictionary -->
+        <ResourceDictionary>
+            
+            <!--Locator-->
+            <infra:InstanceLocator x:Key="Locator"/>
+
+            <!--Constantes-->
+            <x:String x:Key="urlGetLands">https://restcountries.eu/</x:String>
+            <x:String x:Key="urlLands">http://chejconsultor.ddns.net:9014/</x:String>
+            
+        </ResourceDictionary>
+        
+	</Application.Resources>
+    
+</Application>
