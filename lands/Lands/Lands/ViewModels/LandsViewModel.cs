@@ -1,12 +1,12 @@
 ﻿namespace Lands.ViewModels
 {
+    using GalaSoft.MvvmLight.Command;
+    using Lands.Models;
+    using Lands.Services;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Windows.Input;
-    using GalaSoft.MvvmLight.Command;
-    using Lands.Models;
-    using Lands.Services;
     using Xamarin.Forms;
 
     public class LandsViewModel : BaseViewModel
