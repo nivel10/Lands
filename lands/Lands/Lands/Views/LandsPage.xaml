@@ -10,7 +10,55 @@
         <StackLayout BindingContext="{Binding Lands}"
                      Padding="5">
             
-            <Label Text="Lands Page"/>
+            <SearchBar Placeholder="Search...!!!"
+                       SearchCommand="{Binding SearchCommand}"
+                       Text="{Binding Filter, Mode=TwoWay}" />
+            
+            <ListView  HasUnevenRows="true"
+                       IsPullToRefreshEnabled="true" 
+                       IsRefreshing="{Binding IsRefreshing, Mode=TwoWay}"
+                       ItemsSource="{Binding Lands}"
+                       RefreshCommand="{Binding RefreshCommand}">
+                
+                <ListView.ItemTemplate>
+                    
+                    <DataTemplate>
+
+                        <ViewCell>
+
+                            <Grid>
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackLayout Grid.Column="0"
+                                             Grid.Row="0"
+                                             VerticalOptions="Center">
+
+                                    <Label FontAttributes="Bold"
+                                           FontSize="Medium"
+                                           Text="{Binding Name}"
+                                           TextColor="Black"/>
+
+                                    <Label Text="{Binding Capital}"
+                                           TextColor="Black"/>
+                                </StackLayout>
+
+                                <Image Grid.Column="1"
+                                       Grid.Row="0"
+                                       HorizontalOptions="End"
+                                       Source="ic_chevron_right.png"/>
+                            </Grid>
+                            
+                        </ViewCell>
+                        
+                    </DataTemplate>
+                    
+                </ListView.ItemTemplate>
+                
+            </ListView>
             
         </StackLayout>
         

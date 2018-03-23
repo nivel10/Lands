@@ -18,6 +18,7 @@
         private bool isRunning;
         private bool isRemembered;
         private DialogService dialogService;
+        private NavigationService navigationService;
 
         #region Event
 
@@ -178,6 +179,7 @@
         {
             //  Instancia los objetos necesarios
             dialogService = new DialogService();
+            navigationService = new NavigationService();
 
             //  Inicializa los controles
             SetInitialize();
@@ -230,8 +232,9 @@
             //  Genera una instancia del LandsViewModel
             MainViewModel.GetInstance().Lands = new LandsViewModel();
 
-            await Application.Current.MainPage.Navigation.PushAsync(
-            new LandsPage());
+            //  await Application.Current.MainPage.Navigation.PushAsync(
+            //  new LandsPage());
+            await navigationService.Navigate("LandsPage");
                              
             //await dialogService.ShowMessage(
                 //"Information",
