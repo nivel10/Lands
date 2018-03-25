@@ -1,25 +1,26 @@
 ﻿namespace Lands.ViewModels
 {
-    using GalaSoft.MvvmLight.Command;
-    using Lands.Models;
-    using Lands.Services;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Windows.Input;
+    using GalaSoft.MvvmLight.Command;
+    using Lands.Models;
+    using Lands.Services;
     using Xamarin.Forms;
 
     public class LandsViewModel : BaseViewModel
     {
         #region Attributes
 
-        private ObservableCollection<Land> lands;
+        //  private ObservableCollection<Land> lands;
+        private ObservableCollection<LandItemViewModel> lands;
         private ApiService apiService;
         private DialogService dialogService;
         private NavigationService navigationService;
         private bool isRefreshing;
         private string filter;
-        private List<Land> landList;
+        //  private List<Land> landList;
 
         #endregion Attributes
 
@@ -39,12 +40,17 @@
 
         #region Properties
 
-        public ObservableCollection<Land> Lands
+        //public ObservableCollection<Land> Lands
+        //{
+        //    get { return this.lands; }
+        //    set { SetValue(ref this.lands, value); }
+        //}
+
+        public ObservableCollection<LandItemViewModel> Lands
         {
             get { return this.lands; }
             set { SetValue(ref this.lands, value); }
         }
-
         public bool IsRefreshing
         {
             get { return this.isRefreshing; }
@@ -82,7 +88,8 @@
 
         private async void LoadLands()
         {
-            this.Lands = new ObservableCollection<Land>();
+            //  this.Lands = new ObservableCollection<Land>();
+            this.lands = new ObservableCollection<LandItemViewModel>();
             // this.Lands.Clear();
 
             SetStatusControls(true);
@@ -119,9 +126,12 @@
             //  Hace un Cast del objeto Result
             //  var list = (List<Land>)response.Result;
             //  this.Lands = new ObservableCollection<Land>(list);
-            this.landList = (List<Land>)response.Result;
-            this.Lands = new ObservableCollection<Land>(this.landList);
+            //  this.landList = (List<Land>)response.Result;
+            MainViewModel.GetInstance().LandsList = (List<Land>)response.Result;
 
+            //  this.Lands = new ObservableCollection<Land>(this.landList);
+            this.Lands = new ObservableCollection<LandItemViewModel>(
+                this.ToLandItemViewModel());
             SetStatusControls(false);
         }
 
@@ -129,14 +139,21 @@
         {
             if(string.IsNullOrEmpty(this.Filter))
             {
-                this.Lands = new ObservableCollection<Land>(this.landList);
+                //  this.Lands = new ObservableCollection<Land>(this.landList);
+                this.Lands = 
+                    new ObservableCollection<LandItemViewModel>(this.ToLandItemViewModel());
             }
             else
             {
-                this.Lands = new ObservableCollection<Land>(
-                    this.landList
-                    .Where(l => l.Name.ToLower().Contains(this.Filter.ToLower()) 
+                //this.Lands = new ObservableCollection<Land>(
+                    //this.landList
+                    //.Where(l => l.Name.ToLower().Contains(this.Filter.ToLower()) 
+                           //|| l.Capital.ToLower().Contains(this.Filter.ToLower())));
+                this.Lands = new ObservableCollection<LandItemViewModel>(
+                    this.ToLandItemViewModel()
+                    .Where(l => l.Name.ToLower().Contains(this.Filter.ToLower())
                            || l.Capital.ToLower().Contains(this.Filter.ToLower())));
+
             }
         }
 
@@ -145,6 +162,39 @@
             //this.IsEnabled = _isEnabled;
             //this.IsRunning = _isRunning;
             this.IsRefreshing = _isRefreshing;
+        }
+
+        private IEnumerable<LandItemViewModel> ToLandItemViewModel()
+        {
+            //  return this.landList.Select(l => new LandItemViewModel
+            return MainViewModel.GetInstance().LandsList.Select(
+                l => new LandItemViewModel
+            {
+                Alpha2Code = l.Alpha2Code,
+                Alpha3Code = l.Alpha3Code,
+                AltSpellings = l.AltSpellings,
+                Area = l.Area,
+                Borders = l.Borders,
+                CallingCodes = l.CallingCodes,
+                Capital = l.Capital,
+                Cioc = l.Cioc,
+                Currencies = l.Currencies,
+                Demonym = l.Demonym,
+                Flag = l.Flag,
+                Gini = l.Gini,
+                Languages = l.Languages,
+                Latlng = l.Latlng,
+                Name = l.Name,
+                NativeName = l.NativeName,
+                NumericCode = l.NumericCode,
+                Population = l.Population,
+                Region = l.Region,
+                RegionalBlocs = l.RegionalBlocs,
+                Subregion = l.Subregion,
+                Timezones = l.Timezones,
+                TopLevelDomain = l.TopLevelDomain,
+                Translations = l.Translations,
+            });
         }
 
         #endregion Methods

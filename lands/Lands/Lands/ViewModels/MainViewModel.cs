@@ -1,4 +1,7 @@
 ﻿//  CHEJ - this = regla de legibilidad, hace referencia a la propiedad interna de la case
+using System.Collections.Generic;
+using Lands.Models;
+
 namespace Lands.ViewModels
 {
     public class MainViewModel
@@ -17,6 +20,18 @@ namespace Lands.ViewModels
             set;
         }
         public LandsViewModel Lands
+        {
+            get;
+            set;
+        }
+
+        public LandViewModel Land
+        {
+            get;
+            set;
+        }
+
+        public List<Land> LandsList
         {
             get;
             set;

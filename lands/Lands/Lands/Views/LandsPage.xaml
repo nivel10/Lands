@@ -7,10 +7,10 @@
     
     <ContentPage.Content>
         
-        <StackLayout BindingContext="{Binding Lands}"
-                     Padding="5">
+        <StackLayout BindingContext="{Binding Lands}">
             
-            <SearchBar Placeholder="Search...!!!"
+            <SearchBar HeightRequest="50"
+                       Placeholder="Search...!!!"
                        SearchCommand="{Binding SearchCommand}"
                        Text="{Binding Filter, Mode=TwoWay}" />
             
@@ -18,39 +18,50 @@
                        IsPullToRefreshEnabled="true" 
                        IsRefreshing="{Binding IsRefreshing, Mode=TwoWay}"
                        ItemsSource="{Binding Lands}"
-                       RefreshCommand="{Binding RefreshCommand}">
+                       RefreshCommand="{Binding RefreshCommand}"
+                       SeparatorVisibility="None">
                 
                 <ListView.ItemTemplate>
                     
                     <DataTemplate>
 
                         <ViewCell>
+                            
+                            <Frame CornerRadius="15"
+                                   HasShadow="true"
+                                   Margin="5">
+                                
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectLandCommand}"/>
+                                </Frame.GestureRecognizers>
 
-                            <Grid>
+                                <Grid>
 
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <StackLayout Grid.Column="0"
-                                             Grid.Row="0"
-                                             VerticalOptions="Center">
+                                    <StackLayout Grid.Column="0"
+                                                 Grid.Row="0"
+                                                 VerticalOptions="Center">
 
-                                    <Label FontAttributes="Bold"
-                                           FontSize="Medium"
-                                           Text="{Binding Name}"
-                                           TextColor="Black"/>
+                                        <Label FontAttributes="Bold"
+                                               FontSize="Medium"
+                                               Text="{Binding Name}"
+                                               TextColor="Black"/>
 
-                                    <Label Text="{Binding Capital}"
-                                           TextColor="Black"/>
-                                </StackLayout>
+                                        <Label Text="{Binding Capital}"
+                                               TextColor="Black"/>
+                                    </StackLayout>
 
-                                <Image Grid.Column="1"
-                                       Grid.Row="0"
-                                       HorizontalOptions="End"
-                                       Source="ic_chevron_right.png"/>
+                                    <Image Grid.Column="1"
+                                           Grid.Row="0"
+                                           HorizontalOptions="End"
+                                           Source="ic_chevron_right.png"/>
                             </Grid>
+                                
+                            </Frame>
                             
                         </ViewCell>
                         

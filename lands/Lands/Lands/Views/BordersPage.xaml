@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             BindingContext="{Binding Main, Source={StaticResource Locator}}"
+             Title="Borders"
+             Icon="ic_borders"
+             x:Class="Lands.Views.BordersPage">
+    
+    <ContentPage.Content>
+
+        <StackLayout BindingContext="{Binding Land}"
+                     Padding="5">
+
+          <Label HorizontalOptions="Center" 
+                   FontSize="Large"
+                   FontAttributes="Bold"
+                   Text="{Binding Land.Name}"
+                   TextColor="Black"/>
+        
+            <ListView HasUnevenRows="true"
+                      ItemsSource="{Binding Borders}">
+
+                <ListView.ItemTemplate>
+                
+                    <DataTemplate>
+
+                        <ViewCell>
+                       
+                            <Grid>
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="3*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Label Grid.Column="0" 
+                                   Grid.Row="0"
+                                   Text="{Binding Code}"
+                                   TextColor="Black"/>
+
+                            <Label Grid.Column="1" 
+                                   Grid.Row="0"
+                                   Text="{Binding Name}"
+                                   TextColor="Black"/>
+                            
+                            </Grid>
+                        
+                        </ViewCell>
+                    
+                    </DataTemplate>
+                
+                </ListView.ItemTemplate>
+        
+            </ListView>
+            
+        </StackLayout>      
+        
+    </ContentPage.Content>
+    
+</ContentPage>

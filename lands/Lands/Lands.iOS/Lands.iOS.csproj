@@ -112,6 +112,11 @@
     <BundleResource Include="Resources\Icon-Small%403x.png" />
     <InterfaceDefinition Include="Resources\LaunchScreen.storyboard" />
     <BundleResource Include="Resources\ic_chevron_right.png" />
+    <BundleResource Include="Resources\ic_borders.png" />
+    <BundleResource Include="Resources\ic_language.png" />
+    <BundleResource Include="Resources\ic_translate.png" />
+    <BundleResource Include="Resources\ic_monetization_on.png" />
+    <BundleResource Include="Resources\ic_info.png" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
