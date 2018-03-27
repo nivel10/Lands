@@ -17,7 +17,7 @@
         public string Japanese { get; set; }
 
         [JsonProperty(PropertyName = "it")]
-        public string Itlian { get; set; }
+        public string Italian { get; set; }
 
         [JsonProperty(PropertyName = "br")]
         public string Brazilian { get; set; }
@@ -32,6 +32,6 @@
         public string Croatian { get; set; }
 
         [JsonProperty(PropertyName = "fa")]
-        public string Danish { get; set; }
+        public string Persian { get; set; }
     }
 }

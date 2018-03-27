@@ -19,6 +19,7 @@
         private DialogService dialogService;
         private NavigationService navigationService;
         private bool isRefreshing;
+        private bool isEnabled;
         private string filter;
         //  private List<Land> landList;
 
@@ -51,10 +52,17 @@
             get { return this.lands; }
             set { SetValue(ref this.lands, value); }
         }
+
         public bool IsRefreshing
         {
             get { return this.isRefreshing; }
             set { SetValue(ref this.isRefreshing, value); }
+        }
+
+        public bool IsEnabled
+        {
+            get { return this.isEnabled; }
+            set { this.SetValue(ref this.isEnabled, value); }
         }
 
         public string Filter
@@ -92,13 +100,13 @@
             this.lands = new ObservableCollection<LandItemViewModel>();
             // this.Lands.Clear();
 
-            SetStatusControls(true);
+            SetStatusControls(false, true);
 
             //  Valida la conexion en el dispositivo
             var connection = await apiService.CheckConnection();
             if(!connection.IsSuccess)
             {
-                SetStatusControls(false);
+                SetStatusControls(false, false);
                 await dialogService.ShowMessage(
                     "Error", 
                     connection.Message, 
@@ -115,7 +123,7 @@
 
             if(!response.IsSuccess)
             {
-                SetStatusControls(false);
+                SetStatusControls(false, false);
                 await dialogService.ShowMessage(
                     "Error", 
                     response.Message, 
@@ -132,7 +140,7 @@
             //  this.Lands = new ObservableCollection<Land>(this.landList);
             this.Lands = new ObservableCollection<LandItemViewModel>(
                 this.ToLandItemViewModel());
-            SetStatusControls(false);
+            SetStatusControls(true, false);
         }
 
         private void Search()
@@ -157,9 +165,9 @@
             }
         }
 
-        private void SetStatusControls(bool _isRefreshing)
+        private void SetStatusControls(bool _isEnabled, bool _isRefreshing)
         {
-            //this.IsEnabled = _isEnabled;
+            this.IsEnabled = _isEnabled;
             //this.IsRunning = _isRunning;
             this.IsRefreshing = _isRefreshing;
         }
