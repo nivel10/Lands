@@ -13,7 +13,7 @@
             <infra:InstanceLocator x:Key="Locator"/>
 
             <!--Constantes-->
-            <x:String x:Key="urlGetLands">https://restcountries.eu/</x:String>
+            <x:String x:Key="urlGetLands">http://restcountries.eu/</x:String>
             <x:String x:Key="urlLands">http://chejconsultor.ddns.net:9014/</x:String>
             
         </ResourceDictionary>

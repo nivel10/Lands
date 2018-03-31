@@ -2,10 +2,8 @@
 {
     using GalaSoft.MvvmLight.Command;
     using Lands.Services;
-    using Lands.Views;
     using System;
     using System.Windows.Input;
-    using Xamarin.Forms;
 
     //  public class LoginViewModel : INotifyPropertyChanged
     public class LoginViewModel : BaseViewModel
