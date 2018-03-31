@@ -37,6 +37,13 @@ namespace Lands.ViewModels
             set;
         }
 
+
+        public TokenResponse Token
+        {
+            get;
+            set;
+        }
+
         #endregion Properties
 
         #region Constructor

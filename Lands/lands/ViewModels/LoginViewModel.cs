@@ -17,6 +17,7 @@
         private bool isEnabled;
         private bool isRunning;
         private bool isRemembered;
+        private ApiService apiService;
         private DialogService dialogService;
         private NavigationService navigationService;
 
@@ -180,6 +181,7 @@
             //  Instancia los objetos necesarios
             dialogService = new DialogService();
             navigationService = new NavigationService();
+            apiService = new ApiService();
 
             //  Inicializa los controles
             SetInitialize();
@@ -187,7 +189,8 @@
 
             //  Propiedades quemadas (Borrar)
             this.Email = "carlos.e.herrera.j@gmail.com";
-            this.Password = this.Email;
+            //  this.Password = this.Email;
+            this.Password = "chej5654.";
         }
         
         #endregion Costructor
@@ -214,20 +217,58 @@
                 return;
             }
 
-            if (this.Email != "carlos.e.herrera.j@gmail.com"
-                || this.Password != "carlos.e.herrera.j@gmail.com")
+            //if (this.Email != "carlos.e.herrera.j@gmail.com"
+            //    || this.Password != "carlos.e.herrera.j@gmail.com")
+            //{
+            //    await dialogService.ShowMessage(
+            //        "Error",
+            //        "Email or password incorrect...!!!",
+            //        "Accept"
+            //        );
+            //    SetInitialize();
+            //    return;
+            //}
+
+            SetStatusControls(false, true, true);
+
+            var connection = await this.apiService.CheckConnection();
+
+            if(!connection.IsSuccess)
             {
+                SetStatusControls(true, false, true);
                 await dialogService.ShowMessage(
-                    "Error",
-                    "Email or password incorrect...!!!",
-                    "Accept"
-                    );
-                SetInitialize();
+                    "Erros", 
+                    connection.Message, 
+                    "Accept");
                 return;
             }
 
+            //  Optiene el Token del usuario
+            var token = await this.apiService.GetToken(
+                "http://chejconsultor.ddns.net:9015/", 
+                this.Email, 
+                this.Password);
+            
+            if(token == null || !string.IsNullOrEmpty(token.ErrorDescription))
+            {
+                SetStatusControls(true, false, true);
+                await dialogService.ShowMessage(
+                    "Error",
+                    string.IsNullOrEmpty(token.ErrorDescription) ? 
+                        "Something was wrong, please try later...!!!" : 
+                            token.ErrorDescription,
+                    "Accept");
+                return;
+            }
+
+            //  Asigna el estaus de los controles
+            SetStatusControls(true, false, true);
+
             // Inicializa los controles
             SetInitialize();
+
+            //  Guarda en persistenacia la informacion del Token
+            MainViewModel.GetInstance().Token = token;
 
             //  Genera una instancia del LandsViewModel
             MainViewModel.GetInstance().Lands = new LandsViewModel();
