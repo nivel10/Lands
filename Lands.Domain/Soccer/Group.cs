@@ -17,6 +17,6 @@
 
         //  CHEJ - relaciones virtuales
         [JsonIgnore] // <== Evita error al serializar
-        public virtual  ICollection<GroupTeam> GroupTeams { get; set; }
+        public virtual ICollection<GroupTeam> GroupTeams { get; set; }
     }
 }

@@ -1,16 +1,19 @@
 ﻿namespace Lands.BackEnd.Controllers
 {
-    using System.Data.Entity;
-    using System.Threading.Tasks;
-    using System.Net;
-    using System.Web.Mvc;
+    using Lands.BackEnd.Helpers;
     using Lands.BackEnd.Models;
     using Lands.Domain.Soccer;
+    using System.Data.Entity;
+    using System.Net;
+    using System.Threading.Tasks;
+    using System.Web.Mvc;
 
     [Authorize(Roles = "Admin")]
     public class GroupsController : Controller
     {
         private DataContextLocal db = new DataContextLocal();
+
+        #region Methods View
 
         // GET: Groups
         public async Task<ActionResult> Index()
@@ -109,6 +112,72 @@
             return RedirectToAction("Index");
         }
 
+        #endregion Methods View
+
+        #region Methods Other View
+
+        // GET: Groups/AddTeam/5
+        public async Task<ActionResult> AddTeam(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            var group = await db.Groups.FindAsync(id);
+
+            if (group == null)
+            {
+                return HttpNotFound();
+            }
+
+            //  CHEJ - Crea un objeto del GroupTeam
+            var groupTeam = new GroupTeam
+            {
+                GroupId = group.GroupId,
+            };
+
+            //  CHEJ - Invoca el metodo de carga del ViewBag
+            LoadViewBag(group, groupTeam);
+
+            return View(groupTeam);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> AddTeam(GroupTeam groupTeam)
+        {
+            if (ModelState.IsValid)
+            {
+                db.GroupTeams.Add(groupTeam);
+                await db.SaveChangesAsync();
+                return RedirectToAction(
+                    string.Format("Details/{0}", groupTeam.GroupId));
+            }
+
+            var group = await db.Groups.FindAsync(groupTeam.GroupId);
+
+            if (group == null)
+            {
+                return HttpNotFound();
+            }
+
+            //  CHEJ - Carga el ViewBag de Teams
+            LoadViewBag(group, groupTeam);
+
+            return View(groupTeam);
+        }
+
+        #endregion Methods Other View
+
+        #region Methods
+
+        private void LoadViewBag(Group group, GroupTeam groupTeam)
+        {
+            ViewBag.TeamId =
+                new SelectList(CombosHelper.GetTeams(db, group), "TeamId", "Name", groupTeam.TeamId);
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -117,5 +186,7 @@
             }
             base.Dispose(disposing);
         }
+
+        #endregion Methods
     }
 }
