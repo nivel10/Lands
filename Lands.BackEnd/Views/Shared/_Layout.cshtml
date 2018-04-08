@@ -19,14 +19,60 @@
                 </button>
                 @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
+
             <div class="navbar-collapse collapse">
+
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+
+                    @*CHEJ - Menu Anomino*@
+                    <li class="dropdown">
+                        @*<a href="#" class="dropdown-toggle" data-toggle="dropdown">@ECommerce.Domain.Resources.Resource.About<b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.Home, "Index", "Home")</li>
+                                <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.About, "About", "Home")</li>
+                                <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.Contact, "Contact", "Home")</li>
+                            </ul>*@
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Menu<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                            <li>@Html.ActionLink("About", "About", "Home")</li>
+                            <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                        </ul>
+                    </li>
+
+                    @*CHEJ - Define quienes puede ver el DropBox*@
+
+                    @if (User.IsInRole("Admin"))
+                    {
+                        @*<li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">@ECommerce.Domain.Resources.Resource.Administrator<b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.Departments, "Index", "Departments")</li>
+                                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.Cities, "Index", "Cities")</li>
+                                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.States, "Index", "States")</li>
+                                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.Companies, "Index", "Companies")</li>
+                                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.Users, "Index", "Users")</li>
+                                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.AccountTypes, "Index", "AccountTypes")</li>
+                                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.PaymentMethods, "Index", "PaymentMethods")</li>
+                                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.MovementTypes, "Index", "MovementTypes")</li>
+                                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.BankMovementTypes, "Index", "BankMovementTypes")</li>
+                                </ul>
+                            </li>*@
+
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin<b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li>@Html.ActionLink("User Type", "Index", "UserTypes")</li>
+                                <li>@Html.ActionLink("Teams", "Index", "Teams")</li>
+                                <li>@Html.ActionLink("Groups", "Index", "Groups")</li>
+                            </ul>
+                        </li>
+                    }
+
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>
+
         </div>
     </div>
     <div class="container body-content">
