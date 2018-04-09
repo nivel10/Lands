@@ -2,8 +2,10 @@
 {
     using Lands.BackEnd.Helpers;
     using Lands.BackEnd.Models;
+    using Lands.Domain.Others;
     using Lands.Domain.Soccer;
     using System.Data.Entity;
+    using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
     using System.Web.Mvc;
@@ -12,6 +14,7 @@
     public class GroupsController : Controller
     {
         private DataContextLocal db = new DataContextLocal();
+        private Response response = new Response();
 
         #region Methods View
 
@@ -50,8 +53,16 @@
             if (ModelState.IsValid)
             {
                 db.Groups.Add(group);
-                await db.SaveChangesAsync();
-                return RedirectToAction("Index");
+                response = await DbHelper.SaveChangeDB(db);
+
+                if (response.IsSuccess)
+                {
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, response.Message);
+                }
             }
 
             return View(group);
@@ -80,8 +91,16 @@
             if (ModelState.IsValid)
             {
                 db.Entry(group).State = EntityState.Modified;
-                await db.SaveChangesAsync();
-                return RedirectToAction("Index");
+                response = await DbHelper.SaveChangeDB(db);
+
+                if (response.IsSuccess)
+                {
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, response.Message);
+                }
             }
             return View(group);
         }
@@ -107,9 +126,19 @@
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
             var group = await db.Groups.FindAsync(id);
+
             db.Groups.Remove(group);
-            await db.SaveChangesAsync();
-            return RedirectToAction("Index");
+            response = await DbHelper.SaveChangeDB(db);
+
+            if (response.IsSuccess)
+            {
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, response.Message);
+            }
+            return View(group);
         }
 
         #endregion Methods View
@@ -150,9 +179,17 @@
             if (ModelState.IsValid)
             {
                 db.GroupTeams.Add(groupTeam);
-                await db.SaveChangesAsync();
-                return RedirectToAction(
-                    string.Format("Details/{0}", groupTeam.GroupId));
+                response = await DbHelper.SaveChangeDB(db);
+
+                if (response.IsSuccess)
+                {
+                    return RedirectToAction(
+                        string.Format("Details/{0}", groupTeam.GroupId));
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, response.Message);
+                }
             }
 
             var group = await db.Groups.FindAsync(groupTeam.GroupId);
@@ -166,6 +203,33 @@
             LoadViewBag(group, groupTeam);
 
             return View(groupTeam);
+        }
+
+        public async Task<ActionResult> DeleteTeam(int? teamId, int? groupId)
+        {
+            if (teamId != null)
+            {
+                var teamGroup = await db.GroupTeams
+                    .Where(gt => gt.TeamId == teamId)
+                    .FirstOrDefaultAsync();
+
+                if (teamGroup != null)
+                {
+                    db.GroupTeams.Remove(teamGroup);
+                    response = await DbHelper.SaveChangeDB(db);
+
+                    if (response.IsSuccess)
+                    {
+                        return RedirectToAction(
+                            string.Format("Details/{0}", groupId));
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, response.Message);
+                    }
+                }
+            }
+            return View();
         }
 
         #endregion Methods Other View

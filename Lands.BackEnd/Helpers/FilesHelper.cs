@@ -22,6 +22,24 @@
             return pic;
         }
 
+        public static string UploadPhoto(HttpPostedFileBase file, string folder, string nameFile)
+        {
+            string path = string.Empty;
+            string pic = string.Empty;
+            string name = string.Empty;
+
+            if (file != null)
+            {
+                pic = Path.GetFileName(file.FileName);
+                name = string.Format("{0}{1}", nameFile, Path.GetExtension(file.FileName));
+                path = Path.Combine(HttpContext.Current.Server.MapPath(folder), name);
+                file.SaveAs(path);
+            }
+
+            return name;
+            //  return pic;
+        }
+
         public static bool UploadPhoto(MemoryStream stream, string folder, string name)
         {
             try
@@ -43,7 +61,7 @@
             return File.Exists(pahtFile);
         }
 
-        public static Response DeleteFIle(string pathFile)
+        public static Response DeleteFile(string pathFile)
         {
             try
             {
@@ -59,6 +77,5 @@
                 return new Response { IsSuccess = false, Message = ex.Message, Result = null, };
             }
         }
-
     }
 }

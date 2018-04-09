@@ -1,23 +1,33 @@
 ﻿namespace Lands.BackEnd.Controllers
 {
-    using System.Data.Entity;
-    using System.Threading.Tasks;
-    using System.Net;
-    using System.Web.Mvc;
-    using Lands.BackEnd.Models;
-    using Lands.Domain.Soccer;
     using Lands.BackEnd.Helpers;
+    using Lands.BackEnd.Models;
+    using Lands.Domain.Others;
+    using Lands.Domain.Soccer;
     using System;
+    using System.Data.Entity;
+    using System.Linq;
+    using System.Net;
+    using System.Threading.Tasks;
+    using System.Web.Mvc;
 
     [Authorize(Roles = "Admin")]
     public class TeamsController : Controller
     {
         private DataContextLocal db = new DataContextLocal();
+        private Response response = new Response();
+
+        #region Methods View
 
         // GET: Teams
         public async Task<ActionResult> Index()
         {
-            return View(await db.Teams.ToListAsync());
+            var teams = await db.Teams
+                .OrderBy(t => t.Name)
+                .ToListAsync();
+
+            //  return View(await db.Teams.ToListAsync());
+            return View(teams);
         }
 
         // GET: Teams/Details/5
@@ -49,32 +59,72 @@
         {
             if (ModelState.IsValid)
             {
-                if (view.ImageFile != null)
-                {
-                    MethodsHelper.Image = view.ImagePath;
+                //if (view.ImageFile != null)
+                //{
+                //    MethodsHelper.Image = view.ImagePath;
 
-                    //  CEHJ - Guarda la imagen en el FTP
-                    MethodsHelper.Image =
-                        FilesHelper.UploadPhoto(
-                            view.ImageFile,
-                            MethodsHelper.GetFolderSoccerFlag());
+                //    //  CEHJ - Guarda la imagen en el FTP
+                //    MethodsHelper.Image =
+                //        FilesHelper.UploadPhoto(
+                //            view.ImageFile,
+                //            MethodsHelper.GetFolderSoccerFlag());
 
-                    //  CEHJ - Da formato a la imagen
-                    MethodsHelper.Image = 
-                        string.Format(
-                            "{0}{1}",
-                            MethodsHelper.GetFolderSoccerFlag(),
-                            MethodsHelper.Image);
-                }
+                //    //  CEHJ - Da formato a la imagen
+                //    MethodsHelper.Image =
+                //        string.Format(
+                //            "{0}{1}",
+                //            MethodsHelper.GetFolderSoccerFlag(),
+                //            MethodsHelper.Image);
+                //}
 
                 //  CHEJ - Transforma el TeamView a Team
                 var team = this.TeamViewToTeam(view);
                 //  CHEJ - Actualiza el campo ImagePath
-                team.ImagePath = MethodsHelper.Image;
+                //  team.ImagePath = MethodsHelper.Image;
 
                 db.Teams.Add(team);
-                await db.SaveChangesAsync();
-                return RedirectToAction("Index");
+                response = await DbHelper.SaveChangeDB(db);
+
+                if (response.IsSuccess)
+                {
+                    if (view.ImageFile != null)
+                    {
+                        MethodsHelper.Image = view.ImagePath;
+
+                        //  CEHJ - Guarda la imagen en el FTP
+                        MethodsHelper.Image =
+                            FilesHelper.UploadPhoto(
+                                view.ImageFile,
+                                MethodsHelper.GetFolderSoccerFlag(),
+                                Convert.ToString(team.TeamId).Trim());
+
+                        //  CEHJ - Da formato a la imagen
+                        MethodsHelper.Image =
+                            string.Format(
+                                "{0}{1}",
+                                MethodsHelper.GetFolderSoccerFlag(),
+                                MethodsHelper.Image);
+
+                        team.ImagePath = MethodsHelper.Image;
+                        db.Entry(team).State = EntityState.Modified;
+                        response = await DbHelper.SaveChangeDB(db);
+
+                        if (response.IsSuccess)
+                        {
+                            return RedirectToAction("Index");
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(string.Empty, response.Message);
+                            return View(view);
+                        }
+                    }
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, response.Message);
+                }
             }
 
             //  return View(team);
@@ -108,19 +158,38 @@
         {
             if (ModelState.IsValid)
             {
+                //if (view.ImageFile != null)
+                //{
+                //    MethodsHelper.Image = view.ImagePath;
+
+                //    MethodsHelper.Image =
+                //        FilesHelper.UploadPhoto(
+                //            view.ImageFile,
+                //            MethodsHelper.GetFolderSoccerFlag());
+
+                //    MethodsHelper.Image =
+                //        string.Format(
+                //            "{0}{1}",
+                //            MethodsHelper.GetFolderSoccerFlag(),
+                //            MethodsHelper.Image);
+                //}
+
                 if (view.ImageFile != null)
                 {
                     MethodsHelper.Image = view.ImagePath;
 
+                    //  CEHJ - Guarda la imagen en el FTP
                     MethodsHelper.Image =
                         FilesHelper.UploadPhoto(
-                            view.ImageFile, 
-                            MethodsHelper.GetFolderSoccerFlag());
+                            view.ImageFile,
+                            MethodsHelper.GetFolderSoccerFlag(),
+                            Convert.ToString(view.TeamId).Trim());
 
-                    MethodsHelper.Image = 
+                    //  CEHJ - Da formato a la imagen
+                    MethodsHelper.Image =
                         string.Format(
-                            "{0}{1}", 
-                            MethodsHelper.GetFolderSoccerFlag(), 
+                            "{0}{1}",
+                            MethodsHelper.GetFolderSoccerFlag(),
                             MethodsHelper.Image);
                 }
 
@@ -128,8 +197,16 @@
                 team.ImagePath = MethodsHelper.Image;
 
                 db.Entry(team).State = EntityState.Modified;
-                await db.SaveChangesAsync();
-                return RedirectToAction("Index");
+                response = await DbHelper.SaveChangeDB(db);
+
+                if (response.IsSuccess)
+                {
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, response.Message);
+                }
             }
 
             //  return View(team);
@@ -157,11 +234,31 @@
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
             var team = await db.Teams.FindAsync(id);
+            //  Captura la ruta del archivo
+            var imagePath = Server.MapPath(Url.Content(team.ImagePath));
             db.Teams.Remove(team);
-            await db.SaveChangesAsync();
-            return RedirectToAction("Index");
-        }
+            response = await DbHelper.SaveChangeDB(db);
 
+            if (response.IsSuccess)
+            {
+
+                //  Elimina el archivo
+                if (FilesHelper.ExistFile(imagePath))
+                {
+                    var response = FilesHelper.DeleteFile(imagePath);
+                }
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, response.Message);
+            }
+            return View(team);
+        } 
+
+        #endregion Methods View
+
+        #region Methods
 
         private Team TeamViewToTeam(TeamView view)
         {
@@ -190,6 +287,8 @@
                 db.Dispose();
             }
             base.Dispose(disposing);
-        }
+        } 
+
+        #endregion Methods
     }
 }
