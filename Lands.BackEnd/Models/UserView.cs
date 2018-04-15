@@ -1,13 +1,14 @@
 ﻿namespace Lands.BackEnd.Models
 {
-    using Lands.Domain.Soccer;
+    using Lands.Domain;
     using System.ComponentModel.DataAnnotations;
     using System.Web;
 
-    public class TeamView : Team
+    public class UserView : User
     {
         //  CEHJ - propiedad que permite capturar la imagen del BackEnd
         [Display(Name = "Image")]
         public HttpPostedFileBase ImageFile { get; set; }
+
     }
 }

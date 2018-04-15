@@ -53,8 +53,14 @@
     <Compile Include="Connection\DataContext.cs" />
     <Compile Include="Others\Response.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Soccer\Board.cs" />
+    <Compile Include="Soccer\BoardStatus.cs" />
     <Compile Include="Soccer\Group.cs" />
     <Compile Include="Soccer\GroupTeam.cs" />
+    <Compile Include="Soccer\Match.cs" />
+    <Compile Include="Soccer\Prediction.cs" />
+    <Compile Include="Soccer\RelationsMap\MatchesMap.cs" />
+    <Compile Include="Soccer\StatusMatch.cs" />
     <Compile Include="Soccer\Team.cs" />
     <Compile Include="User.cs" />
     <Compile Include="UserType.cs" />
@@ -62,6 +68,9 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resource\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

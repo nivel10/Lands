@@ -11,7 +11,7 @@
     using System.Threading.Tasks;
     using System.Web.Mvc;
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin, User")]
     public class TeamsController : Controller
     {
         private DataContextLocal db = new DataContextLocal();
@@ -46,6 +46,7 @@
         }
 
         // GET: Teams/Create
+        [Authorize(Roles = "Admin")]
         public ActionResult Create()
         {
             return View();
@@ -132,6 +133,7 @@
         }
 
         // GET: Teams/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Edit(int? id)
         {
             if (id == null)
@@ -214,6 +216,7 @@
         }
 
         // GET: Teams/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Delete(int? id)
         {
             if (id == null)
@@ -236,12 +239,12 @@
             var team = await db.Teams.FindAsync(id);
             //  Captura la ruta del archivo
             var imagePath = Server.MapPath(Url.Content(team.ImagePath));
+
             db.Teams.Remove(team);
             response = await DbHelper.SaveChangeDB(db);
 
             if (response.IsSuccess)
             {
-
                 //  Elimina el archivo
                 if (FilesHelper.ExistFile(imagePath))
                 {

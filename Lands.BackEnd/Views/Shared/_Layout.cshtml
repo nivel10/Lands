@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <title>@ViewBag.Title - World Soccer Russia 2018</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
 
@@ -17,7 +17,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                @Html.ActionLink("World Soccer Russia 2018", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
 
             <div class="navbar-collapse collapse">
@@ -32,7 +32,7 @@
                                 <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.About, "About", "Home")</li>
                                 <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.Contact, "Contact", "Home")</li>
                             </ul>*@
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Menu<b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">About...<b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             <li>@Html.ActionLink("Home", "Index", "Home")</li>
                             <li>@Html.ActionLink("About", "About", "Home")</li>
@@ -62,7 +62,23 @@
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin<b class="caret"></b></a>
                             <ul class="dropdown-menu">
+
                                 <li>@Html.ActionLink("User Type", "Index", "UserTypes")</li>
+                                <li>@Html.ActionLink("Users", "Index", "Users")</li>
+                                <li>@Html.ActionLink("Teams", "Index", "Teams")</li>
+                                <li>@Html.ActionLink("Groups", "Index", "Groups")</li>
+                                <li>@Html.ActionLink("Status Matches", "Index", "StatusMatches")</li>
+                                <li>@Html.ActionLink("Status Board", "Index", "BoardStatus")</li>
+                                <li>@Html.ActionLink("Boards", "Index", "Boards")</li>
+                                <li>@Html.ActionLink("Predictions", "Index", "Predictions")</li>
+                            </ul>
+                        </li>
+                    }
+                    else if (User.IsInRole("User"))
+                    {
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">User Menu<b class="caret"></b></a>
+                            <ul class="dropdown-menu">
                                 <li>@Html.ActionLink("Teams", "Index", "Teams")</li>
                                 <li>@Html.ActionLink("Groups", "Index", "Groups")</li>
                             </ul>
@@ -79,7 +95,7 @@
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+            <p>&copy; @DateTime.Now.Year - World Soccer Russia 2018</p>
         </footer>
     </div>
 

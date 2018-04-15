@@ -1,6 +1,8 @@
 ﻿namespace Lands.Domain
 {
+    using Lands.Domain.Soccer;
     using Newtonsoft.Json;
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
@@ -32,6 +34,8 @@
         [Display(Name = "Image")]
         public string ImagePath { get; set; }
 
+        [Display(Name = "User Type")]
+        [Range(1, 100, ErrorMessage = "The field {0} only can contais value between {1} and {2}...!!!")]
         public int UserTypeId { get; set; }
 
         [JsonIgnore]
@@ -54,7 +58,7 @@
                 }
 
                 return string.Format(
-                    "http://chejconsultor.ddns.net:9015/{0}",
+                    "http://chejconsultor.ddns.net:9015{0}",
                     ImagePath.Substring(1));
             }
         }
@@ -67,5 +71,15 @@
                 return string.Format("{0} {1}", this.FirstName, this.LastName);
             }
         }
+
+        #region Relations Table
+
+        [JsonIgnore]
+        public virtual ICollection<Board> Boards { get; set; }
+
+        [JsonIgnore]
+        public virtual ICollection<Prediction> Predictions { get; set; }
+
+        #endregion Relations Table
     }
 }

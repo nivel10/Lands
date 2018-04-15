@@ -4,13 +4,14 @@
     using Lands.BackEnd.Models;
     using Lands.Domain.Others;
     using Lands.Domain.Soccer;
+    using System;
     using System.Data.Entity;
     using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
     using System.Web.Mvc;
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin, User")]
     public class GroupsController : Controller
     {
         private DataContextLocal db = new DataContextLocal();
@@ -31,15 +32,22 @@
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
             var group = await db.Groups.FindAsync(id);
+
             if (group == null)
             {
                 return HttpNotFound();
             }
+
+            //  CHEJ - Asigna la Hora segun el pais
+            SetLocalTaimeMatch(group);
+
             return View(group);
         }
 
         // GET: Groups/Create
+        [Authorize(Roles = "Admin")]
         public ActionResult Create()
         {
             return View();
@@ -69,6 +77,7 @@
         }
 
         // GET: Groups/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Edit(int? id)
         {
             if (id == null)
@@ -106,6 +115,7 @@
         }
 
         // GET: Groups/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Delete(int? id)
         {
             if (id == null)
@@ -145,7 +155,7 @@
 
         #region Methods Other View
 
-        // GET: Groups/AddTeam/5
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> AddTeam(int? id)
         {
             if (id == null)
@@ -167,7 +177,7 @@
             };
 
             //  CHEJ - Invoca el metodo de carga del ViewBag
-            LoadViewBag(group, groupTeam);
+            LoadViewBagTeams(group, groupTeam);
 
             return View(groupTeam);
         }
@@ -200,7 +210,7 @@
             }
 
             //  CHEJ - Carga el ViewBag de Teams
-            LoadViewBag(group, groupTeam);
+            LoadViewBagTeams(group, groupTeam);
 
             return View(groupTeam);
         }
@@ -209,13 +219,13 @@
         {
             if (teamId != null)
             {
-                var teamGroup = await db.GroupTeams
+                var groupTeam = await db.GroupTeams
                     .Where(gt => gt.TeamId == teamId)
                     .FirstOrDefaultAsync();
 
-                if (teamGroup != null)
+                if (groupTeam != null)
                 {
-                    db.GroupTeams.Remove(teamGroup);
+                    db.GroupTeams.Remove(groupTeam);
                     response = await DbHelper.SaveChangeDB(db);
 
                     if (response.IsSuccess)
@@ -232,14 +242,172 @@
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> AddMatch(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Error: GroupId is null...!!!");
+            }
+
+            var group = await db.Groups.FindAsync(id);
+            if (group == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Error: Group is null...!!!");
+            }
+
+            var match = new Match
+            {
+                DateTime = DateTime.Today,
+                GroupId = group.GroupId,
+                StatusMatchId = MethodsHelper.GetStatusMatchIdByName("Not Started", db),
+            };
+
+            //  Carga los ViewBag
+            LoadViewBagsMatchTeams(match);
+
+            return View(match);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> AddMatch(Match match)
+        {
+            if (ModelState.IsValid)
+            {
+                //  CHEJ - Valida que los equipos sean diferente
+                if (match.LocalId != match.VisitorId)
+                {
+                    //  CHEJ - Actualiza la hora al Huso Horario Universal
+                    match.DateTime = match.DateTime.ToUniversalTime();
+                    db.Matches.Add(match);
+                    response = await DbHelper.SaveChangeDB(db);
+                    if (response.IsSuccess)
+                    {
+                        return RedirectToAction(string.Format("Details/{0}", match.GroupId));
+                    }
+                    ModelState.AddModelError(string.Empty, response.Message);
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Error: the team local and the visitor must be different...!!!");
+                }
+            }
+
+            //  CHEJ - Carga los datos de los ViewBag
+            LoadViewBagsMatchTeams(match);
+
+            return View(match);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> EditMatch(int? localId, int? visitorId, int? matchId, int? groupId)
+        {
+            if (matchId == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            var match = await db.Matches.FindAsync(matchId);
+            if (match == null)
+            {
+                return HttpNotFound();
+            }
+
+            //  CHEJ - Actualiza la fecha a formato local
+            match.DateTime = match.DateTime.ToLocalTime();
+
+            //  CHEJ - Carga los datos de los ViewBag
+            LoadViewBagsMatchTeams(match);
+
+            return View(match);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> EditMatch(Match match)
+        {
+            if (ModelState.IsValid)
+            {
+                //  CHEJ - Valida que los equipos sean diferente
+                if (match.LocalId != match.VisitorId)
+                {
+                    match.DateTime = match.DateTime.ToUniversalTime();
+                    db.Entry(match).State = EntityState.Modified;
+                    response = await DbHelper.SaveChangeDB(db);
+
+                    if (response.IsSuccess)
+                    {
+                        return RedirectToAction(string.Format("Details/{0}", match.GroupId));
+                    }
+                    ModelState.AddModelError(string.Empty, response.Message);
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Error: the team local and the visitor must be different...!!!");
+                } 
+            }
+
+            //  CHEJ - Carga los datos de los ViewBag
+            LoadViewBagsMatchTeams(match);
+
+            return View(match);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> DeleteMatch(int? localId, int? visitorId, int? matchId, int? groupId)
+        {
+            if (matchId != null)
+            {
+                var match = await db.Matches.FindAsync(matchId);
+                if (match == null)
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Error: Match is null...!!!");
+                }
+                db.Matches.Remove(match);
+                response = await DbHelper.SaveChangeDB(db);
+                if (response.IsSuccess)
+                {
+                    return RedirectToAction(string.Format("Details/{0}", groupId));
+                }
+                ModelState.AddModelError(string.Empty, response.Message);
+                return RedirectToAction(string.Format("Details/{0}", groupId));
+            }
+            else
+            {
+                if (groupId != null)
+                {
+                    ModelState.AddModelError(string.Empty, "Error: MatchId is null...!!!");
+                    return RedirectToAction(string.Format("Details/{0}", groupId));
+                }
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Error: GroupId is null...!!!");
+            }
+        }
+
         #endregion Methods Other View
 
         #region Methods
 
-        private void LoadViewBag(Group group, GroupTeam groupTeam)
+        private void LoadViewBagTeams(Group group, GroupTeam groupTeam)
         {
             ViewBag.TeamId =
                 new SelectList(CombosHelper.GetTeams(db, group), "TeamId", "Name", groupTeam.TeamId);
+        }
+
+        private void LoadViewBagsMatchTeams(Match match)
+        {
+            ViewBag.LocalId =
+                new SelectList(CombosHelper.GetTeams(match.GroupId, match.LocalId, db), "TeamId", "Name", match.LocalId);
+
+            ViewBag.VisitorId =
+                new SelectList(CombosHelper.GetTeams(match.GroupId, match.VisitorId, db), "TeamId", "Name", match.VisitorId);
+        }
+
+        private void SetLocalTaimeMatch(Group group)
+        {
+            foreach (var match in group.Matches)
+            {
+                match.DateTime = match.DateTime.ToLocalTime();
+            }
         }
 
         protected override void Dispose(bool disposing)

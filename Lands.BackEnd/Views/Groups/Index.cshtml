@@ -7,27 +7,101 @@
 <h2>Groups</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create", new { }, new { @class = "btn btn-primary" })
+    @if (User.IsInRole("Admin"))
+    {
+        @Html.ActionLink("Create New", "Create", new { }, new { @class = "btn btn-primary" })
+    }
+    else
+    {
+        @Html.ActionLink("Create New", "Create", new { }, new { @class = "btn btn-primary", @disabled = "disabled" })
+    }
 </p>
+
+
 <table class="table">
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.Name)
         </th>
-        <th></th>
+
+        <th class="text-right">
+            # Teams
+        </th>
+
+        <th class="text-right">
+            # Matches
+        </th>
+
+        <th class="text-right">
+            # Matches No Start
+        </th>
+
+        <th class="text-right">
+            # Matches Closed
+        </th>
+
+        <th>
+        </th>
+
+        <th>
+        </th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Name)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id = item.GroupId }, new { @class = "btn btn-warning" })
-            @Html.ActionLink("Details", "Details", new { id = item.GroupId }, new { @class = "btn btn-info" })
-            @Html.ActionLink("Delete", "Delete", new { id = item.GroupId }, new { @class = "btn btn-danger" })
-        </td>
-    </tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+
+            <td class="text-right">
+                @Html.DisplayFor(modelItem => item.GroupTeams.Count)
+            </td>
+
+            <td class="text-right">
+                @Html.DisplayFor(modelItem => item.Matches.Count)
+            </td>
+
+            <td class="text-right">
+                @Html.DisplayFor(modelItem => item.Matches.Where(m => m.StatusMatch.StatusMatchId == 2).ToList().Count)
+            </td>
+
+            <td class="text-right">
+                @Html.DisplayFor(modelItem => item.Matches.Where(m => m.StatusMatch.StatusMatchId == 1).ToList().Count)
+            </td>
+
+            <td></td>
+
+            <td>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    @Html.ActionLink("Edit", "Edit", new { id = item.GroupId }, new { @class = "btn btn-warning" })
+                }
+                else
+                {
+                    @Html.ActionLink("Edit", "Edit", new { id = item.GroupId }, new { @class = "btn btn-warning", @disabled = "disabled" })
+                }
+
+                @if (User.IsInRole("Admin"))
+                {
+                    @Html.ActionLink("Details", "Details", new { id = item.GroupId }, new { @class = "btn btn-info" })
+                }
+                else
+                {
+                    @Html.ActionLink("Details", "Details", new { id = item.GroupId }, new { @class = "btn btn-info" })
+                }
+
+                @if (User.IsInRole("Admin"))
+                {
+                    @Html.ActionLink("Delete", "Delete", new { id = item.GroupId }, new { @class = "btn btn-danger" })
+                }
+                else
+                {
+                    @Html.ActionLink("Delete", "Delete", new { id = item.GroupId }, new { @class = "btn btn-danger", @disabled = "disabled" })
+                }
+            </td>
+        </tr>
+    }
 
 </table>

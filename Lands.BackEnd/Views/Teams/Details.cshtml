@@ -29,6 +29,21 @@
     </dl>
 </div>
 <p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.TeamId }, new { @class = "btn btn-warning" })
-    @Html.ActionLink("Back to List", "Index", new { }, new { @class = "btn btn-success" })
+    @if (User.IsInRole("Admin"))
+    {
+        @Html.ActionLink("Edit", "Edit", new { id = Model.TeamId }, new { @class = "btn btn-warning" })
+    }
+    else
+    {
+        @Html.ActionLink("Edit", "Edit", new { id = Model.TeamId }, new { @class = "btn btn-warning", @disabled = "disabled" })
+    }
+
+    @if (User.IsInRole("Admin"))
+    {
+        @Html.ActionLink("Back to List", "Index", new { }, new { @class = "btn btn-success" })
+    }
+    else
+    {
+        @Html.ActionLink("Back to List", "Index", new { }, new { @class = "btn btn-success"})
+    }
 </p>
