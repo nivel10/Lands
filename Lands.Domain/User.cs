@@ -72,6 +72,9 @@
             }
         }
 
+        [Display(Name = "App Name")]
+        public string AppName { get; set; }
+
         #region Relations Table
 
         [JsonIgnore]
