@@ -1,8 +1,8 @@
-﻿namespace Lands.BackEnd.Helpers
+﻿namespace Lands.API.Helpers
 {
     using System;
     using System.Linq;
-    using Lands.BackEnd.Models;
+    using Lands.API.Models;
     using Lands.Domain.Soccer;
 
     public class MethodsHelper
