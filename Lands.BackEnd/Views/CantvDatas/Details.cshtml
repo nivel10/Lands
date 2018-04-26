@@ -1,0 +1,43 @@
+﻿@model Lands.Domain.GetServices.CantvData
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Cantv Data</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.User.FirstName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.User.FirstName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CodePhone)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CodePhone)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.NuberPhone)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.NuberPhone)
+        </dd>
+
+    </dl>
+</div>
+
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.CantvDataId }, new { @class = "btn btn-warning" })
+    @Html.ActionLink("Back to List", "Index", new { }, new { @class = "btn btn-success" })
+</p>

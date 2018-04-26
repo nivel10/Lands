@@ -27,11 +27,11 @@
                     @*CHEJ - Menu Anomino*@
                     <li class="dropdown">
                         @*<a href="#" class="dropdown-toggle" data-toggle="dropdown">@ECommerce.Domain.Resources.Resource.About<b class="caret"></b></a>
-                            <ul class="dropdown-menu">
-                                <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.Home, "Index", "Home")</li>
-                                <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.About, "About", "Home")</li>
-                                <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.Contact, "Contact", "Home")</li>
-                            </ul>*@
+            <ul class="dropdown-menu">
+                <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.Home, "Index", "Home")</li>
+                <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.About, "About", "Home")</li>
+                <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.Contact, "Contact", "Home")</li>
+            </ul>*@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">About...<b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             <li>@Html.ActionLink("Home", "Index", "Home")</li>
@@ -45,22 +45,22 @@
                     @if (User.IsInRole("Admin"))
                     {
                         @*<li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">@ECommerce.Domain.Resources.Resource.Administrator<b class="caret"></b></a>
-                                <ul class="dropdown-menu">
-                                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.Departments, "Index", "Departments")</li>
-                                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.Cities, "Index", "Cities")</li>
-                                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.States, "Index", "States")</li>
-                                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.Companies, "Index", "Companies")</li>
-                                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.Users, "Index", "Users")</li>
-                                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.AccountTypes, "Index", "AccountTypes")</li>
-                                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.PaymentMethods, "Index", "PaymentMethods")</li>
-                                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.MovementTypes, "Index", "MovementTypes")</li>
-                                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.BankMovementTypes, "Index", "BankMovementTypes")</li>
-                                </ul>
-                            </li>*@
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">@ECommerce.Domain.Resources.Resource.Administrator<b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.Departments, "Index", "Departments")</li>
+                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.Cities, "Index", "Cities")</li>
+                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.States, "Index", "States")</li>
+                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.Companies, "Index", "Companies")</li>
+                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.Users, "Index", "Users")</li>
+                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.AccountTypes, "Index", "AccountTypes")</li>
+                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.PaymentMethods, "Index", "PaymentMethods")</li>
+                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.MovementTypes, "Index", "MovementTypes")</li>
+                    <li>@Html.ActionLink(ECommerce.Domain.Resources.Resource.BankMovementTypes, "Index", "BankMovementTypes")</li>
+                </ul>
+            </li>*@
 
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin<b class="caret"></b></a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Russia 2018<b class="caret"></b></a>
                             <ul class="dropdown-menu">
 
                                 <li>@Html.ActionLink("User Type", "Index", "UserTypes")</li>
@@ -71,6 +71,19 @@
                                 <li>@Html.ActionLink("Status Board", "Index", "BoardStatus")</li>
                                 <li>@Html.ActionLink("Boards", "Index", "Boards")</li>
                                 <li>@Html.ActionLink("Predictions", "Index", "Predictions")</li>
+
+                            </ul>
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Get Services - VzLa<b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+
+                                <li>@Html.ActionLink("Nationalities", "Index", "Nationalities")</li>
+                                <li>@Html.ActionLink("Cantv Datas", "Index", "CantvDatas")</li>
+                                <li>@Html.ActionLink("Cne & Ivss Datas", "Index", "CneIvssDatas")</li>
+                                <li>@Html.ActionLink("Zoom Datas", "Index", "ZoomDatas")</li>
+
                             </ul>
                         </li>
                     }

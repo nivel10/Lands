@@ -51,6 +51,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Connection\DataContext.cs" />
+    <Compile Include="GetServices\CantvData.cs" />
+    <Compile Include="GetServices\CneIvssData.cs" />
+    <Compile Include="GetServices\Nationality.cs" />
+    <Compile Include="GetServices\ZoomData.cs" />
     <Compile Include="Helpers\DbHelper.cs" />
     <Compile Include="Helpers\MethodsHelper.cs" />
     <Compile Include="Others\Response.cs" />

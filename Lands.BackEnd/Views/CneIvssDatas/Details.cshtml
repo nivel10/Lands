@@ -1,0 +1,63 @@
+﻿@model Lands.Domain.GetServices.CneIvssData
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>CneIvssData</h4>
+    <hr />
+    <dl class="dl-horizontal">
+
+        <dt>
+            @Html.DisplayNameFor(model => model.User.FullName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.User.FullName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Nationality.Abbreviation)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Nationality.Abbreviation)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.IdentificationCard)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IdentificationCard)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BirthDate)
+        </dt>
+        <dd>
+            @*@Html.DisplayFor(model => model.BirthDate)*@
+            @Convert.ToDateTime(Model.BirthDate).ToString("dd/MM/yyyy")
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.IsCne)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IsCne)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.IsIvss)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IsIvss)
+        </dd>
+
+    </dl>
+</div>
+
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.CneIvssDataId }, new { @class = "btn btn-warning" })
+    @Html.ActionLink("Back to List", "Index", new { }, new { @class = "btn btn-success" })
+</p>

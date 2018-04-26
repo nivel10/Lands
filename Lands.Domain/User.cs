@@ -1,5 +1,6 @@
 ﻿namespace Lands.Domain
 {
+    using Lands.Domain.GetServices;
     using Lands.Domain.Soccer;
     using Newtonsoft.Json;
     using System.Collections.Generic;
@@ -82,6 +83,15 @@
 
         [JsonIgnore]
         public virtual ICollection<Prediction> Predictions { get; set; }
+
+        [JsonIgnore]
+        public virtual ICollection<CantvData> CantvDatas { get; set; }
+
+        [JsonIgnore]
+        public virtual ICollection<CneIvssData> CneIvssDatas { get; set; }
+
+        [JsonIgnore]
+        public virtual ICollection<ZoomData> ZoomDatas { get; set; }
 
         #endregion Relations Table
     }

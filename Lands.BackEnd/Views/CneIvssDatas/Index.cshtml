@@ -1,0 +1,81 @@
+﻿@model IEnumerable<Lands.Domain.GetServices.CneIvssData>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create", new { }, new { @class = "btn btn-primary" })
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.User.FullName)
+        </th>
+
+        <th>
+            @Html.DisplayNameFor(model => model.Nationality.Abbreviation)
+        </th>
+
+        <th>
+            @Html.DisplayNameFor(model => model.IdentificationCard)
+        </th>
+
+        <th>
+            @Html.DisplayNameFor(model => model.BirthDate)
+        </th>
+
+        <th>
+            @Html.DisplayNameFor(model => model.IsCne)
+        </th>
+
+        <th>
+            @Html.DisplayNameFor(model => model.IsIvss)
+        </th>
+
+        <th></th>
+
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.User.FullName)
+            </td>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.Nationality.Abbreviation)
+            </td>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.IdentificationCard)
+            </td>
+
+            <td>
+                @*@Html.DisplayFor(modelItem => item.BirthDate.ToString("dd/MM/YYYY"));*@
+                @Convert.ToDateTime(item.BirthDate).ToString("dd/MM/yyyy")
+            </td>
+
+            <td>
+
+                @Html.DisplayFor(modelItem => item.IsCne)
+            </td>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.IsIvss)
+            </td>
+
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.CneIvssDataId }, new { @class = "btn btn-warning" })
+                @Html.ActionLink("Details", "Details", new { id = item.CneIvssDataId }, new { @class = "btn btn-info" })
+                @Html.ActionLink("Delete", "Delete", new { id = item.CneIvssDataId }, new { @class = "btn btn-danger" })
+            </td>
+
+        </tr>
+    }
+
+</table>

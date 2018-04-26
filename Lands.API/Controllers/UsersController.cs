@@ -15,16 +15,51 @@
     using System.Web.Http;
     using System.Web.Http.Description;
 
+    [RoutePrefix("api/Users")]
     public class UsersController : ApiController
     {
         private DataContextLocal db = new DataContextLocal();
         private Response response = new Response();
 
-        //  [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         // GET: api/Users
         public IQueryable<User> GetUsers()
         {
             return db.Users;
+        }
+
+        [Authorize(Roles = "Admin, User")]
+        [HttpPost]
+        [Route("GetServicesVzLaUSerByEmail")]
+        public async Task<IHttpActionResult> GetServicesVzLaUSerByEmail(string email)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(email))
+                {
+                    ModelState.AddModelError(string.Empty, "Error: email is null...!!!");
+                    return BadRequest(ModelState);
+                }
+
+                var user = await db.Users
+                     .Include(u => u.CantvDatas)
+                     .Include(u => u.CneIvssDatas)
+                     .Include(u => u.ZoomDatas)
+                     .Where(u => u.Email == email)
+                     .FirstOrDefaultAsync();
+
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Error: user is null...!!!");
+                    return BadRequest(ModelState);
+                }
+
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [Authorize(Roles = "Admin, User")]
@@ -77,6 +112,7 @@
             return StatusCode(HttpStatusCode.NoContent);
         }
 
+        [Authorize(Roles = "Admin, User")]
         // POST: api/Users
         [ResponseType(typeof(User))]
         public async Task<IHttpActionResult> PostUser(User user)
@@ -145,6 +181,7 @@
                 }
                 catch (Exception ex)
                 {
+                    ModelState.AddModelError(string.Empty, ex.Message);
                     return BadRequest(ModelState);
                 }
             }

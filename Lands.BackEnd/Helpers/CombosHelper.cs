@@ -2,6 +2,7 @@
 {
     using Lands.BackEnd.Models;
     using Lands.Domain;
+    using Lands.Domain.GetServices;
     using Lands.Domain.Soccer;
     using System.Collections.Generic;
     using System.Linq;
@@ -58,6 +59,21 @@
             return teams.OrderBy(t => t.Name).ToList();
         }
 
+        public static List<Nationality> GetNationalities(DataContextLocal dbLocal)
+        {
+            var nationality = dbLocal.Nationalities
+                .OrderBy(n => n.NationalityId)
+                .ToList();
+            nationality.Add(new Nationality
+            {
+                 NationalityId = 0, 
+                 Abbreviation = "S",
+                 Name = "[Select a nationality...!!!]",
+            });
+
+            return nationality.OrderBy(n => n.NationalityId).ToList();
+        }
+
         private static List<Team> GetListTeam(Group group)
         {
             var teamList = new List<Team>();
@@ -67,6 +83,24 @@
             }
 
             return teamList.ToList();
+        }
+
+        public static List<User> GetUsersGetServicesVzLa(DataContextLocal dbLocal)
+        {
+            var appName = MethodsHelper.GetAppNameGetServices();
+            var userList = dbLocal.Users
+                .Where(u => u.AppName == appName)
+                .ToList();
+
+            userList.Add(new User
+            {
+                UserId = 0,
+                FirstName = "[Select an user...!!!]",
+                LastName = string.Empty,
+            }
+            );
+
+            return userList.OrderBy(u => u.UserId).ToList();
         }
 
         private static void AddBlankTeam(List<Team> teams)

@@ -1,4 +1,4 @@
-﻿@model Lands.Domain.UserType
+﻿@model Lands.Domain.GetServices.ZoomData
 
 @{
     ViewBag.Title = "Delete";
@@ -8,15 +8,23 @@
 
 <h3>Are you sure you want to delete this?</h3>
 <div>
-    <h4>User Type</h4>
+    <h4>Zoom Data</h4>
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.Name)
+            @Html.DisplayNameFor(model => model.User.FullName)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.Name)
+            @Html.DisplayFor(model => model.User.FullName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Tracking)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Tracking)
         </dd>
 
     </dl>

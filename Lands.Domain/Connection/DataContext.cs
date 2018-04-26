@@ -1,5 +1,6 @@
 ﻿namespace Lands.Domain.Connection
 {
+    using Lands.Domain.GetServices;
     using Lands.Domain.Soccer;
     using Lands.Domain.Soccer.RelationsMap;
     using System.Data.Entity;
@@ -28,6 +29,14 @@
         public DbSet<Board> Boards { get; set; }
 
         public DbSet<Prediction> Predictions { get; set; }
+
+        public DbSet<CantvData> CantvDatas { get; set; }
+
+        public DbSet<Nationality> Nationalities { get; set; }
+
+        public DbSet<CneIvssData> CneIvssDatas { get; set; }
+
+        public DbSet<ZoomData> ZoomDatas { get; set; }
 
         #endregion Properties
 

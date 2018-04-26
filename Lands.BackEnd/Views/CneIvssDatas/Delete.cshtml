@@ -1,0 +1,70 @@
+﻿@model Lands.Domain.GetServices.CneIvssData
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>CNE & IVSS Data</h4>
+    <hr />
+    <dl class="dl-horizontal">
+
+        <dt>
+            @Html.DisplayNameFor(model => model.User.FullName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.User.FullName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Nationality.Abbreviation)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Nationality.Abbreviation)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.IdentificationCard)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IdentificationCard)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BirthDate)
+        </dt>
+        <dd>
+            @*@Html.DisplayFor(model => model.BirthDate)*@
+            @Convert.ToDateTime(Model.BirthDate).ToString("dd/MM/yyyy")
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.IsCne)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IsCne)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.IsIvss)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IsIvss)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-danger" />
+            @Html.ActionLink("Back to List", "Index", new { }, new { @class = "btn btn-success" })
+        </div>
+
+    }
+</div>

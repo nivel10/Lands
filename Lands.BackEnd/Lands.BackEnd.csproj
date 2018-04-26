@@ -202,14 +202,18 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\BoardsController.cs" />
     <Compile Include="Controllers\BoardStatusController.cs" />
+    <Compile Include="Controllers\CantvDatasController.cs" />
+    <Compile Include="Controllers\CneIvssDatasController.cs" />
     <Compile Include="Controllers\GroupsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\NationalitiesController.cs" />
     <Compile Include="Controllers\PredictionsController.cs" />
     <Compile Include="Controllers\StatusMatchesController.cs" />
     <Compile Include="Controllers\TeamsController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Controllers\UserTypesController.cs" />
+    <Compile Include="Controllers\ZoomDatasController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -229,6 +233,8 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\bootstrap-datetimepicker.css" />
+    <Content Include="Content\bootstrap-datetimepicker.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\Images\NoImage.png" />
@@ -236,6 +242,8 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Scripts\bootstrap-datetimepicker.js" />
+    <Content Include="Scripts\bootstrap-datetimepicker.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="ApplicationInsights.config">
@@ -251,6 +259,10 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
+    <Content Include="Scripts\moment-with-locales.js" />
+    <Content Include="Scripts\moment-with-locales.min.js" />
+    <Content Include="Scripts\moment.js" />
+    <Content Include="Scripts\moment.min.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Web.config">
@@ -332,6 +344,26 @@
     <Content Include="Views\Predictions\Details.cshtml" />
     <Content Include="Views\Predictions\Edit.cshtml" />
     <Content Include="Views\Predictions\Index.cshtml" />
+    <Content Include="Views\CantvDatas\Create.cshtml" />
+    <Content Include="Views\CantvDatas\Delete.cshtml" />
+    <Content Include="Views\CantvDatas\Details.cshtml" />
+    <Content Include="Views\CantvDatas\Edit.cshtml" />
+    <Content Include="Views\CantvDatas\Index.cshtml" />
+    <Content Include="Views\Nationalities\Create.cshtml" />
+    <Content Include="Views\Nationalities\Delete.cshtml" />
+    <Content Include="Views\Nationalities\Details.cshtml" />
+    <Content Include="Views\Nationalities\Edit.cshtml" />
+    <Content Include="Views\Nationalities\Index.cshtml" />
+    <Content Include="Views\CneIvssDatas\Create.cshtml" />
+    <Content Include="Views\CneIvssDatas\Delete.cshtml" />
+    <Content Include="Views\CneIvssDatas\Details.cshtml" />
+    <Content Include="Views\CneIvssDatas\Edit.cshtml" />
+    <Content Include="Views\CneIvssDatas\Index.cshtml" />
+    <Content Include="Views\ZoomDatas\Create.cshtml" />
+    <Content Include="Views\ZoomDatas\Delete.cshtml" />
+    <Content Include="Views\ZoomDatas\Details.cshtml" />
+    <Content Include="Views\ZoomDatas\Edit.cshtml" />
+    <Content Include="Views\ZoomDatas\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

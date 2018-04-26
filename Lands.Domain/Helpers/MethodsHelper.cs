@@ -49,7 +49,7 @@
 
                 return statusMacth.StatusMatchId;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return -1;
             }

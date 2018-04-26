@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Web.Configuration;
     using Lands.BackEnd.Models;
     using Lands.Domain.Soccer;
 
@@ -49,7 +50,7 @@
 
                 return statusMacth.StatusMatchId;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return -1;
             }
@@ -58,6 +59,13 @@
         public static string GetPathUserImages()
         {
             return "~/Content/Users/Images/";
+        }
+
+        public static string GetAppNameGetServices()
+        {
+            var appNameGetServices =
+                WebConfigurationManager.AppSettings["AppNameGetServices"].ToString().Trim();
+            return appNameGetServices;
         }
     }
 }
