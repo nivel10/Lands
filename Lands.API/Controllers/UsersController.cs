@@ -31,7 +31,6 @@
         }
 
         [Authorize(Roles = "Admin, User")]
-        [HttpPost]
         [Route("GetServicesVzLaUSerByEmail")]
         public async Task<IHttpActionResult> GetServicesVzLaUSerByEmail(string email)
         {
