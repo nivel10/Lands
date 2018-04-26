@@ -2,9 +2,11 @@
 {
     using Lands.API.Helpers;
     using Lands.API.Models;
+    using Lands.API.Models.ServicesVzLa;
     using Lands.Domain;
     using Lands.Domain.Others;
     using System;
+    using System.Collections.Generic;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     using System.IO;
@@ -41,20 +43,87 @@
                     return BadRequest(ModelState);
                 }
 
-                var user = await db.Users
+                var userByEmail = await db.Users
                      .Include(u => u.CantvDatas)
                      .Include(u => u.CneIvssDatas)
                      .Include(u => u.ZoomDatas)
                      .Where(u => u.Email == email)
-                     .FirstOrDefaultAsync();
-
-                if (user == null)
+                     .ToListAsync();
+                
+                if (userByEmail == null)
                 {
                     ModelState.AddModelError(string.Empty, "Error: user is null...!!!");
                     return BadRequest(ModelState);
                 }
 
-                return Ok(user);
+                var userResponse = new List<ServicesVzLaUserResponse>();
+                foreach (var user in userByEmail)
+                {
+                    //  Load values of CantvData in the List<ServicesVzLaCantvDataResponse>
+                    var cantvDatas = new List<ServicesVzLaCantvDataResponse>();
+                    foreach (var cantvdata in user
+                        .CantvDatas
+                        .OrderBy(cd => cd.CodePhone)
+                        .ThenBy(cd => cd.NuberPhone))
+                    {
+                        cantvDatas.Add(new ServicesVzLaCantvDataResponse
+                        {
+                            CantvDataId = cantvdata.CantvDataId,
+                            CodePhone = cantvdata.CodePhone,
+                             NuberPhone = cantvdata.NuberPhone,
+                        });
+                    }
+
+                    //  Load values of CneIvssData in the List<ServicesVzLaCantvDataResponse>
+                    var cneIvssDatas = new List<ServicesVzLaCneIvssDataResponse>();
+                    foreach (var cneIvssData in user
+                        .CneIvssDatas
+                        .OrderBy(cid => cid.Nationality.Abbreviation)
+                        .ThenBy(cid => cid.IdentificationCard))
+                    {
+                        cneIvssDatas.Add(new ServicesVzLaCneIvssDataResponse
+                        {
+                            BirthDate = cneIvssData.BirthDate,
+                            CneIvssDataId = cneIvssData.CneIvssDataId,
+                            IdentificationCard = cneIvssData.IdentificationCard,
+                            IsCne = cneIvssData.IsCne,
+                            IsIvss = cneIvssData.IsIvss,
+                            NationalityId = cneIvssData.NationalityId,
+                             
+                        });
+                    }
+
+                    //  Load values of ZoomDatas in the List<ServicesVzLaZoomDataResponse>
+                    var zoomDatas = new List<ServicesVzLaZoomDataResponse>();
+                    foreach (var zoomData in user.ZoomDatas
+                        .OrderBy(zd => zd.Tracking))
+                    {
+                        zoomDatas.Add(new ServicesVzLaZoomDataResponse
+                        {
+                            Tracking = zoomData.Tracking,
+                            ZoomDataId = zoomData.ZoomDataId,
+                        });
+                    }
+
+                    userResponse.Add(new ServicesVzLaUserResponse
+                    {
+                        AppName = user.AppName,
+                        CantvDatas = cantvDatas,
+                        CneIvssDatas = cneIvssDatas,
+                        Email = user.Email,
+                        FirstName = user.FirstName,
+                        ImageArray = user.ImageArray,
+                        ImagePath = user.ImagePath,
+                        LastName = user.LastName,
+                        Password = user.Password,
+                        Telephone = user.Telephone,
+                        UserId = user.UserId,
+                        UserTypeId = user.UserTypeId,
+                        ZoomDatas = zoomDatas,
+                    });
+                }
+
+                return Ok(userResponse);
             }
             catch (Exception ex)
             {
