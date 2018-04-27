@@ -26,7 +26,7 @@
                 .Include(c => c.User)
                 .OrderBy(c => c.UserId)
                 .ThenBy(c => c.CodePhone)
-                .ThenBy(c => c.NuberPhone)
+                .ThenBy(c => c.NumberPhone)
                 .Where(c => c.User.AppName == appName)
                 .ToListAsync();
 

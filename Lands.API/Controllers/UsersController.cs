@@ -63,13 +63,13 @@
                     foreach (var cantvdata in user
                         .CantvDatas
                         .OrderBy(cd => cd.CodePhone)
-                        .ThenBy(cd => cd.NuberPhone))
+                        .ThenBy(cd => cd.NumberPhone))
                     {
                         cantvDatas.Add(new ServicesVzLaCantvDataResponse
                         {
                             CantvDataId = cantvdata.CantvDataId,
                             CodePhone = cantvdata.CodePhone,
-                             NuberPhone = cantvdata.NuberPhone,
+                             NumberPhone = cantvdata.NumberPhone,
                         });
                     }
 
