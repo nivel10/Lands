@@ -1,5 +1,9 @@
 ﻿namespace Lands.API.Controllers
 {
+    using Lands.API.Helpers;
+    using Lands.API.Models;
+    using Lands.Domain.GetServices;
+    using Lands.Domain.Others;
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
@@ -8,13 +12,12 @@
     using System.Threading.Tasks;
     using System.Web.Http;
     using System.Web.Http.Description;
-    using Lands.API.Models;
-    using Lands.Domain.GetServices;
 
     [RoutePrefix("api/CantvDatas")]
     public class CantvDatasController : ApiController
     {
         private DataContextLocal db = new DataContextLocal();
+        private Response response = new Response();
 
         [Authorize(Roles = "Admin")]
         // GET: api/CantvDatas
@@ -70,19 +73,29 @@
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(ModelState);                  
             }
 
             if (id != cantvData.CantvDataId)
             {
-                return BadRequest();
+                //  return BadRequest();
+                ModelState.AddModelError(string.Empty, "Error: Id != CantvDataId...!!!");
+                return BadRequest(ModelState);
             }
 
             db.Entry(cantvData).State = EntityState.Modified;
 
             try
             {
-                await db.SaveChangesAsync();
+                //  await db.SaveChangesAsync();
+                response = await DbHelper.SaveChangeDB(db);
+                if (response.IsSuccess)
+                {
+                    return StatusCode(HttpStatusCode.NoContent);
+                }
+
+                ModelState.AddModelError(string.Empty, response.Message);
+                return BadRequest(ModelState);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -110,9 +123,14 @@
             }
 
             db.CantvDatas.Add(cantvData);
-            await db.SaveChangesAsync();
+            response = await DbHelper.SaveChangeDB(db);
+            if (response.IsSuccess)
+            {
+                return CreatedAtRoute("DefaultApi", new { id = cantvData.CantvDataId }, cantvData);
+            }
 
-            return CreatedAtRoute("DefaultApi", new { id = cantvData.CantvDataId }, cantvData);
+            ModelState.AddModelError(string.Empty, response.Message);
+            return BadRequest(ModelState);
         }
 
         [Authorize(Roles = "Admin, User")]
@@ -123,13 +141,21 @@
             var cantvData = await db.CantvDatas.FindAsync(id);
             if (cantvData == null)
             {
-                return NotFound();
+                //  return NotFound();
+                ModelState.AddModelError(string.Empty, "Error: CantvData is null...!!!");
+                return BadRequest(ModelState);
             }
 
             db.CantvDatas.Remove(cantvData);
-            await db.SaveChangesAsync();
+            response = await DbHelper.SaveChangeDB(db);
+            if (response.IsSuccess)
+            {
+                return Ok(cantvData);
+            }
 
-            return Ok(cantvData);
+            // return Ok(cantvData);
+            ModelState.AddModelError(string.Empty, response.Message);
+            return BadRequest(ModelState);
         }
 
         protected override void Dispose(bool disposing)
