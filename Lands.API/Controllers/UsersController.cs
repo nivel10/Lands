@@ -61,7 +61,7 @@
                         servicesNationalities.Add(new ServicesVzLaNationalityResponse
                         {
                             Abbreviation = nationality.Abbreviation,
-                            Name = nationality.Abbreviation,
+                            Name = nationality.Name,
                             NationalityId = nationality.NationalityId,
                         });
                     }
