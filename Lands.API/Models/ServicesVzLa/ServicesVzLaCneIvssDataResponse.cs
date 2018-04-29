@@ -1,6 +1,7 @@
 ﻿namespace Lands.API.Models.ServicesVzLa
 {
     using System;
+    using System.Collections.Generic;
 
     public class ServicesVzLaCneIvssDataResponse
     {
@@ -43,6 +44,9 @@
 
         //[JsonIgnore]
         //public virtual Nationality Nationality { get; set; }
+
+        //[JsonIgnore]
+        public List<ServicesVzLaNationalityResponse> NationalityDatas { get; set; }
 
         #endregion Relations Table
     }
