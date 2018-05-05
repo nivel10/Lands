@@ -2,6 +2,7 @@
 {
     using Lands.API.Models;
     using Lands.Domain.GetServices;
+    using Lands.Domain.Others;
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
@@ -10,11 +11,13 @@
     using System.Threading.Tasks;
     using System.Web.Http;
     using System.Web.Http.Description;
+    using Lands.API.Helpers;
 
     [RoutePrefix("api/CneIvssDatas")]
     public class CneIvssDatasController : ApiController
     {
         private DataContextLocal db = new DataContextLocal();
+        private Response response = new Response();
 
         [Authorize(Roles = "Admin")]
         // GET: api/CneIvssDatas
@@ -108,10 +111,28 @@
                 return BadRequest(ModelState);
             }
 
-            db.CneIvssDatas.Add(cneIvssData);
-            await db.SaveChangesAsync();
+            //  Find the record if exist
+            var oldCneIvssData = await db.CneIvssDatas
+                .Where(cid => cid.IsCne == true && 
+                       cid.IdentificationCard == cneIvssData.IdentificationCard)
+                .FirstOrDefaultAsync();
 
-            return CreatedAtRoute("DefaultApi", new { id = cneIvssData.CneIvssDataId }, cneIvssData);
+            if (oldCneIvssData != null)
+            {
+                ModelState.AddModelError(string.Empty, "There is already a record with the same record...!!!");
+                return BadRequest(ModelState.First().Value.Errors[0].ErrorMessage.Trim());
+            }
+
+            db.CneIvssDatas.Add(cneIvssData);
+            response = await DbHelper.SaveChangeDB(db);
+
+            if (response.IsSuccess)
+            {
+                return CreatedAtRoute("DefaultApi", new { id = cneIvssData.CneIvssDataId }, cneIvssData);
+            }
+
+            ModelState.AddModelError(string.Empty, response.Message);
+            return BadRequest(ModelState);
         }
 
         [Authorize(Roles = "Admin, User")]
