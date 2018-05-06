@@ -114,7 +114,9 @@
             //  Find the record if exist
             var oldCneIvssData = await db.CneIvssDatas
                 .Where(cid => cid.IsCne == true && 
-                       cid.IdentificationCard == cneIvssData.IdentificationCard)
+                       cid.IdentificationCard == cneIvssData.IdentificationCard &&
+                       cid.NationalityId == cneIvssData.NationalityId &&
+                       cid.UserId == cneIvssData.UserId)
                 .FirstOrDefaultAsync();
 
             if (oldCneIvssData != null)
