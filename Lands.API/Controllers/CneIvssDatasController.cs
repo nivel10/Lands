@@ -77,14 +77,23 @@
 
             if (id != cneIvssData.CneIvssDataId)
             {
-                return BadRequest();
+                ModelState.AddModelError(string.Empty, "Error: Id is not equal to CneIvssDataId...!!!");
+                //  return BadRequest(ModelState.First().Value.Errors[0].ErrorMessage.Trim());
+                return BadRequest("Error: Id is not equal to CneIvssDataId...!!!");
             }
 
             db.Entry(cneIvssData).State = EntityState.Modified;
 
             try
             {
-                await db.SaveChangesAsync();
+                //  await db.SaveChangesAsync();
+                response = await DbHelper.SaveChangeDB(db);
+                if (!response.IsSuccess)
+                {
+                    ModelState.AddModelError(string.Empty, response.Message);
+                    //  return BadRequest(ModelState.First().Value.Errors[0].ErrorMessage.Trim());
+                    return BadRequest(response.Message);
+                }
             }
             catch (DbUpdateConcurrencyException)
             {
