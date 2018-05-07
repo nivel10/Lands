@@ -110,7 +110,7 @@
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        [Authorize(Roles = "Admin, User")]
+        [Authorize(Roles = "Admin")]
         // POST: api/CneIvssDatas
         [ResponseType(typeof(CneIvssData))]
         public async Task<IHttpActionResult> PostCneIvssData(CneIvssData cneIvssData)
@@ -147,6 +147,77 @@
         }
 
         [Authorize(Roles = "Admin, User")]
+        // POST: api/CneIvssDatas
+        [Route("PostCneIvssDataInsertByOption")]
+        [ResponseType(typeof(CneIvssData))]
+        public async Task<IHttpActionResult> PostCneIvssDataInsertByOption(string _option, CneIvssData _cneIvssData)
+        {
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError(string.Empty, "Error: CneIvssData is not valid...!!!");
+                //  return BadRequest(ModelState);
+                return BadRequest("Error: CneIvssData is not valid...!!!");
+            }
+
+            try
+            {
+                //  Find the record if exist
+                //var oldCneIvssData = await db.CneIvssDatas
+                //    .Where(cid => cid.CneIvssDataId == _cneIvssData.CneIvssDataId)
+                //    .FirstOrDefaultAsync();
+                //  Find the record if exist
+                var oldCneIvssData = await db.CneIvssDatas
+                   .Where(cid => cid.UserId == _cneIvssData.UserId &&
+                                 cid.NationalityId == _cneIvssData.NationalityId &&
+                                 cid.IdentificationCard == _cneIvssData.IdentificationCard)
+                   .FirstOrDefaultAsync();
+
+                if (oldCneIvssData != null)
+                {
+                    switch (_option)
+                    {
+                        case "cne":
+                            if (oldCneIvssData.IsCne == false)
+                            {
+                                oldCneIvssData.IsCne = true;
+                                _cneIvssData.IsCne = true;
+                                db.Entry(oldCneIvssData).State = EntityState.Modified;
+                            }
+                            else
+                            {
+                                ModelState.AddModelError(string.Empty, "There is already a record with the same record...!!!");
+                                //  return BadRequest(ModelState.First().Value.Errors[0].ErrorMessage.Trim());
+                                return BadRequest("There is already a record with the same record...!!!");
+                            }
+                                break;
+                        case "ivss":
+                            break;
+                    }
+                }
+                else
+                {
+                    db.CneIvssDatas.Add(_cneIvssData);
+                }
+                
+                response = await DbHelper.SaveChangeDB(db);
+
+                if (response.IsSuccess)
+                {
+                    return Ok(_cneIvssData);
+                    //  return CreatedAtRoute("DefaultApi", new { id = _cneIvssData.CneIvssDataId }, _cneIvssData);
+                }
+
+                ModelState.AddModelError(string.Empty, response.Message);
+                return BadRequest(ModelState);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
         // DELETE: api/CneIvssDatas/5
         [ResponseType(typeof(CneIvssData))]
         public async Task<IHttpActionResult> DeleteCneIvssData(int id)
