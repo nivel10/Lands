@@ -154,11 +154,78 @@
             var cneIvssData = await db.CneIvssDatas.FindAsync(id);
             if (cneIvssData == null)
             {
-                return NotFound();
+                ModelState.AddModelError(string.Empty, "Error: CneIvssData is null...!!!");
+                //  return NotFound();
+                return BadRequest("Error: CneIvssData is null...!!!");
             }
 
-            db.CneIvssDatas.Remove(cneIvssData);
-            await db.SaveChangesAsync();
+            try
+            {
+                db.CneIvssDatas.Remove(cneIvssData);
+                response = await DbHelper.SaveChangeDB(db);
+                if(!response.IsSuccess)
+                {
+                    ModelState.AddModelError(string.Empty, response.Message);
+                    return BadRequest(response.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return BadRequest(ex.Message);
+            }
+            
+            return Ok(cneIvssData);
+        }
+
+        [Authorize(Roles = "Admin, User")]
+        // DELETE: api/CneIvssDatas/5
+        [Route("PostCneIvssDataByOption")]
+        [ResponseType(typeof(CneIvssData))]
+        public async Task<IHttpActionResult> PostCneIvssDataByOption(string _option, CneIvssData cneIvssData)
+        {
+            try
+            {
+                if(cneIvssData == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Error: CneIvssData is null...!!!");
+                    return BadRequest("Error: CneIvssData is null...!!!");
+                }
+
+                var findCneIvssData = await db.CneIvssDatas.FindAsync(cneIvssData.CneIvssDataId);
+                if (findCneIvssData == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Error: FindCneIvssData is null...!!!");
+                    return BadRequest("Error: FindCneIvssData is null...!!!");
+                }
+
+                switch (_option)
+                {
+                    case "cne":
+                        if (findCneIvssData.IsIvss == false)
+                        {
+                            db.CneIvssDatas.Remove(findCneIvssData);
+                        }
+                        else
+                        {
+                            findCneIvssData.IsCne = false;
+                            db.Entry(findCneIvssData).State = EntityState.Modified;
+                        }
+                        break;
+                }
+
+                response = await DbHelper.SaveChangeDB(db);
+                if (!response.IsSuccess)
+                {
+                    ModelState.AddModelError(string.Empty, response.Message);
+                    return BadRequest(response.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return BadRequest(ex.Message);
+            }
 
             return Ok(cneIvssData);
         }
