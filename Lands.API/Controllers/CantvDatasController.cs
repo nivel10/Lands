@@ -104,12 +104,12 @@
                     return NotFound();
                 }
                 else
-                {
+                {   
                     throw;
                 }
             }
 
-            return StatusCode(HttpStatusCode.NoContent);
+            //return StatusCode(HttpStatusCode.NoContent);
         }
 
         [Authorize(Roles = "Admin, User")]

@@ -191,6 +191,20 @@
                             }
                                 break;
                         case "ivss":
+                            if (oldCneIvssData.IsIvss == false)
+                            {
+                                oldCneIvssData.IsIvss = true;
+                                oldCneIvssData.BirthDate = _cneIvssData.BirthDate;
+                                _cneIvssData.IsIvss = true;
+                                db.Entry(oldCneIvssData).State = EntityState.Modified;
+                            }
+                            else
+                            {
+                                ModelState.AddModelError(string.Empty, "There is already a record with the same record...!!!");
+                                //  return BadRequest(ModelState.First().Value.Errors[0].ErrorMessage.Trim());
+                                return BadRequest("There is already a record with the same record...!!!");
+                            }
+
                             break;
                     }
                 }
@@ -280,6 +294,17 @@
                         else
                         {
                             findCneIvssData.IsCne = false;
+                            db.Entry(findCneIvssData).State = EntityState.Modified;
+                        }
+                        break;
+                    case "ivss":
+                        if (findCneIvssData.IsCne == false)
+                        {
+                            db.CneIvssDatas.Remove(findCneIvssData);
+                        }
+                        else
+                        {
+                            findCneIvssData.IsIvss = false;
                             db.Entry(findCneIvssData).State = EntityState.Modified;
                         }
                         break;
