@@ -86,7 +86,7 @@
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, User")]
         // POST: api/ZoomDatas
         [ResponseType(typeof(ZoomData))]
         public async Task<IHttpActionResult> PostZoomData(ZoomData zoomData)
@@ -122,21 +122,36 @@
             //  return CreatedAtRoute("DefaultApi", new { id = zoomData.ZoomDataId }, zoomData);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, User")]
         // DELETE: api/ZoomDatas/5
         [ResponseType(typeof(ZoomData))]
         public async Task<IHttpActionResult> DeleteZoomData(int id)
         {
-            ZoomData zoomData = await db.ZoomDatas.FindAsync(id);
-            if (zoomData == null)
+            try
             {
-                return NotFound();
+                var zoomData = await db.ZoomDatas.FindAsync(id);
+                if (zoomData == null)
+                {
+                    //  return NotFound();
+                    ModelState.AddModelError(string.Empty, "Error: ZoomData is null...!!!");
+                    return BadRequest("Error: ZoomData is null...!!!");
+                }
+
+                db.ZoomDatas.Remove(zoomData);
+                response = await DbHelper.SaveChangeDB(db);
+                if (!response.IsSuccess)
+                {
+                    ModelState.AddModelError(string.Empty, response.Message);
+                    return BadRequest(response.Message);
+                }
+                
+                return Ok(zoomData);
             }
-
-            db.ZoomDatas.Remove(zoomData);
-            await db.SaveChangesAsync();
-
-            return Ok(zoomData);
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return BadRequest(ex.Message);
+            }   
         }
 
         protected override void Dispose(bool disposing)
