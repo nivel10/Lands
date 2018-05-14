@@ -196,6 +196,94 @@
         }
 
         [Authorize(Roles = "Admin, User")]
+        [ResponseType(typeof(void))]
+        [Route("PutUserEdit")]
+        public async Task<IHttpActionResult> PutUserEdit(int id, ServicesVzLaUserEdit _userEdit)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    ModelState.AddModelError(string.Empty, "Error: UserEdit is not valid...!!!");
+                    return BadRequest("Error: UserEdit is not valid...!!!");
+                }
+
+                if (id != _userEdit.UserId)
+                {
+                    ModelState.AddModelError(string.Empty, "Error: id is no equal to UserEditId, is not valid...!!!");
+                    return BadRequest("Error: id is no equal to UserEditId, is not valid...!!!");
+                }
+
+                //  Find if exist the user by email
+                var userEdit = await db.Users
+                    .Where(us => us.Email == _userEdit.NewEmail &&
+                           us.UserId != id)
+                     .FirstOrDefaultAsync();
+                if (userEdit != null)
+                {
+                    ModelState.AddModelError(
+                        string.Empty,
+                        string.Format(
+                            "This email: {0} is already registered, you must try another ... !!!",
+                            _userEdit.NewEmail));
+                    return BadRequest(string.Format(
+                            "This email: {0} is already registered, you must try another ... !!!",
+                            _userEdit.NewEmail));
+                }
+
+                userEdit = await db.Users.FindAsync(id);
+                if (userEdit != null)
+                {
+                    userEdit.Email = _userEdit.NewEmail;
+                    db.Entry(userEdit).State = EntityState.Modified;
+                    response = await DbHelper.SaveChangeDB(db);
+
+                    if (response.IsSuccess)
+                    {
+                        if (await UsersHelper.UpdateUserName(_userEdit.Email, _userEdit.NewEmail))
+                        {
+                            return Ok("Information: Successfully updated registration...!!!");
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(
+                                string.Empty, 
+                                string.Format(
+                                    "Error Updating the email: {0} to the email {1}...!!!",
+                                    _userEdit.Email,
+                                    _userEdit.NewEmail));
+                            return BadRequest(string.Format(
+                                "Error Updating the email: {0} to the email {1}...!!!",
+                                _userEdit.Email,
+                                _userEdit.NewEmail));
+                        }
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, response.Message);
+                        return BadRequest(response.Message);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(
+                        string.Empty,
+                        string.Format(
+                            "This email: {0} is not registered... !!!",
+                            _userEdit.Email));
+                    return BadRequest(string.Format(
+                        "This email: {0} is not registered... !!!",
+                        _userEdit.Email));
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize(Roles = "Admin, User")]
         // POST: api/Users
         [ResponseType(typeof(User))]
         public async Task<IHttpActionResult> PostUser(User user)
@@ -265,7 +353,7 @@
                 catch (Exception ex)
                 {
                     ModelState.AddModelError(string.Empty, ex.Message);
-                    return BadRequest(ModelState);
+                    return BadRequest(ex.Message);
                 }
             }
         }
