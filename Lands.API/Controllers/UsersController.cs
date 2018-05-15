@@ -161,38 +161,78 @@
 
         [Authorize(Roles = "Admin, User")]
         // PUT: api/Users/5
-        [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutUser(int id, User user)
+        //  [ResponseType(typeof(void))]
+        [ResponseType(typeof(User))]
+        public async Task<IHttpActionResult> PutUser(int id, User _user)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (id != user.UserId)
-            {
-                return BadRequest();
-            }
-
-            db.Entry(user).State = EntityState.Modified;
-
             try
             {
-                await db.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
+                if (!ModelState.IsValid)
                 {
-                    return NotFound();
+                    //  return BadRequest(ModelState);
+                    ModelState.AddModelError(string.Empty, "Error: User is not valid...!!!");
+                    return BadRequest("Error: User is not valid...!!!");
                 }
-                else
-                {
-                    throw;
-                }
-            }
 
-            return StatusCode(HttpStatusCode.NoContent);
+                if (id != _user.UserId)
+                {
+                    //  return BadRequest();
+                    ModelState.AddModelError(string.Empty, "Error: Id is not equal to UserId...!!!");
+                    return BadRequest("Error: Id is not equal to UserId...!!!");
+                }
+
+                db.Entry(_user).State = EntityState.Modified;
+                response = await DbHelper.SaveChangeDB(db);
+
+                if (!response.IsSuccess)
+                {
+                    ModelState.AddModelError(string.Empty, response.Message);
+                    return BadRequest(response.Message);
+                }
+
+                //  CHEJ - Sube las imagenes
+                if (_user.ImageArray != null &&
+                    _user.ImageArray.Length > 0)
+                {
+                    var stream = new MemoryStream(_user.ImageArray);
+                    MethodsHelper.Image = _user.ImagePath;
+
+                    //  CHEJ - Guarda la imagen en el FTP
+                    MethodsHelper.Image =
+                        FilesHelper.UploadPhoto(
+                            stream,
+                            MethodsHelper.GetPathUserImages(),
+                            Convert.ToString(_user.UserId).Trim());
+
+                    //  CHEJ - Da formato a la imagen
+                    MethodsHelper.Image =
+                        string.Format(
+                            "{0}{1}",
+                            MethodsHelper.GetPathUserImages(),
+                            MethodsHelper.Image);
+
+                    //  Actualiza la informacion del usuario
+                    _user.ImagePath = MethodsHelper.Image;
+                    db.Entry(_user).State = EntityState.Modified;
+                    response = await DbHelper.SaveChangeDB(db);
+                    if (response.IsSuccess)
+                    {
+                        return Ok(_user);
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, response.Message);
+                        return BadRequest(response.Message);
+                    }
+                }
+                //  return StatusCode(HttpStatusCode.NoContent);
+                return Ok(_user);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return BadRequest(ex.Message);
+            }
         }
 
         [Authorize(Roles = "Admin, User")]
