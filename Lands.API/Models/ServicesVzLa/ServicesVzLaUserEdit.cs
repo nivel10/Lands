@@ -13,5 +13,13 @@
             get;
             set;
         }
+
+        [Required(ErrorMessage = "The field {0} is requiered...!!")]
+        [DataType(DataType.Password)]
+        public string NewPassword
+        {
+            get;
+            set;
+        }
     }
 }

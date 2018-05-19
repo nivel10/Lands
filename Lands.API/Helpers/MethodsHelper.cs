@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Web.Http.ModelBinding;
     using Lands.API.Models;
     using Lands.Domain.Soccer;
 
@@ -53,6 +54,26 @@
             {
                 return -1;
             }
+        }
+
+        public static string GetErrorsModelState(ModelStateDictionary _modelState)
+        {
+            var errors = string.Empty;
+            foreach (var modelState in _modelState)
+            {
+                if (modelState.Value.Errors.Count > 0)
+                {
+                    foreach (var item in modelState.Value.Errors)
+                    {
+                        //  errors += item.Exception.Message + System.Char.ConvertFromUtf32(13);
+                        errors += 
+                            (item.Exception == null ? 
+                                item.ErrorMessage :
+                                    item.Exception.Message) + System.Char.ConvertFromUtf32(13);
+                    }
+                }
+            }
+            return errors;
         }
 
         public static string GetPathUserImages()

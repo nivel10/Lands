@@ -5,13 +5,14 @@
     using Lands.API.Models.ServicesVzLa;
     using Lands.Domain;
     using Lands.Domain.Others;
+    using Microsoft.AspNet.Identity;
+    using Microsoft.AspNet.Identity.EntityFramework;
+    using Newtonsoft.Json.Linq;
     using System;
     using System.Collections.Generic;
     using System.Data.Entity;
-    using System.Data.Entity.Infrastructure;
     using System.IO;
     using System.Linq;
-    using System.Net;
     using System.Threading.Tasks;
     using System.Web.Configuration;
     using System.Web.Http;
@@ -22,6 +23,143 @@
     {
         private DataContextLocal db = new DataContextLocal();
         private Response response = new Response();
+        private string errorMessages = string.Empty;
+
+        [HttpPost]
+        [Route("PasswordRecovery")]
+        public async Task<IHttpActionResult> PasswordRecovery(JObject form)
+        {
+            try
+            {
+                errorMessages = string.Empty;
+                var email = string.Empty;
+                dynamic jsonObject = form;
+
+                email = jsonObject.Email.Value;
+
+                var user = await db.Users
+                    .Where(u => u.Email.ToLower() == email.ToLower())
+                    .FirstOrDefaultAsync();
+                if (user == null)
+                {
+                    //  return NotFound();
+                    errorMessages = string.Format(
+                        "Error: incorrect email (Users): {0} ...!!!",
+                        email);
+                    ModelState.AddModelError(string.Empty, errorMessages);
+                    return BadRequest(errorMessages);
+                }
+
+                var userContext = new ApplicationDbContext();
+                var userManager = 
+                    new UserManager<ApplicationUser>(
+                        new UserStore<ApplicationUser>(userContext));
+                var userASP = userManager.FindByEmail(email);
+                if (userASP == null)
+                {
+                    //  return NotFound();
+                    errorMessages = string.Format(
+                        "Error: incorrect email (ASP) {0} ...!!!",
+                        email);
+                    ModelState.AddModelError(string.Empty, errorMessages);
+                    return BadRequest(errorMessages);
+                }
+
+                var random = new Random();
+                var newPassword = string.Format("{0}", random.Next(100000, 999999));
+                var response1 = userManager.RemovePassword(userASP.Id);
+                var response2 = await userManager.AddPasswordAsync(userASP.Id, newPassword);
+                if (response2.Succeeded)
+                {
+                    var subject = "GetServicesVzLa - Password Recovery...!!!";
+                    var body = string.Format(@"
+                        <h1>GetServices App - Password Recovery</h1>
+                        <p>Your new password is: <strong>{0}</strong></p>
+                        <p>Please, don't forget change it for one easy remember for you....!!!</p>
+                        <p> </p>
+                        <h1> CHEJ Consultor, C.A. </h1>
+                        <h2> - Su Requerimiento es Nuestro Comrpomiso - </h2>",
+                        newPassword);
+
+                    await MailHelper.SendMail(email, subject, body);
+                    return Ok(true);
+                }
+
+                return BadRequest("The password can't be changed.");
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin, User")]
+        [Route("EditPassword")]
+        public async Task<IHttpActionResult> EditPassword(ServicesVzLaUserEdit _user)
+        {
+            //  var errorMessages = string.Empty;
+            errorMessages = string.Empty;
+            try
+            {
+                var email = string.Empty;
+                var currentPassword = string.Empty;
+                var newPassword = string.Empty;
+                //  dynamic jsonObject = _user;
+
+                if (!ModelState.IsValid)
+                {
+                    //  Gets error of the ModelState
+                    errorMessages = "Error: the UserEdit is not valid...!!!" + System.Char.ConvertFromUtf32(13);
+                    errorMessages += MethodsHelper.GetErrorsModelState(ModelState);
+
+                    ModelState.AddModelError(string.Empty, errorMessages);
+                    return BadRequest(errorMessages);
+                }
+
+                //  email = jsonObject.Email.Value;
+                //  currentPassword = jsonObject.CurrentPassword.Value;
+                //  newPassword = jsonObject.NewPassword.Value;
+                email = _user.Email;
+                currentPassword = _user.Password;
+                newPassword = _user.NewPassword;
+
+
+                var userContext = new ApplicationDbContext();
+                var userManager =
+                    new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(userContext));
+                var userASP = userManager.FindByEmail(email);
+
+                if (userASP == null)
+                {
+                    //  return NotFound();
+                    ModelState.AddModelError(string.Empty, "Error: UserASP (By Email) is null...!!!");
+                    return BadRequest("Error: UserASP (By Email) is null...!!!");
+                }
+
+                var response =
+                    await userManager.ChangePasswordAsync(
+                        userASP.Id,
+                        currentPassword,
+                        newPassword);
+                if (!response.Succeeded)
+                {
+                    errorMessages = "Error: " + System.Char.ConvertFromUtf32(13);
+                    errorMessages += response.Errors.FirstOrDefault();
+                    ModelState.AddModelError(string.Empty, errorMessages);
+                    return BadRequest(response.Errors.FirstOrDefault());
+                }
+
+                return Ok(true);
+            }
+            catch(Exception ex)
+            {
+                errorMessages = string.Format("Error: {0}", ex.Message);
+                //  return BadRequest("Incorrect call");
+                return BadRequest(errorMessages);
+            }
+        }
 
         [Authorize(Roles = "Admin")]
         // GET: api/Users
