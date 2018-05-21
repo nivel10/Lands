@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Connection\DataContext.cs" />
+    <Compile Include="FacebookResponse.cs" />
     <Compile Include="GetServices\CantvData.cs" />
     <Compile Include="GetServices\CneIvssData.cs" />
     <Compile Include="GetServices\Nationality.cs" />

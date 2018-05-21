@@ -11,6 +11,7 @@
     using System;
     using System.Collections.Generic;
     using System.Data.Entity;
+    using System.Data.Entity.Validation;
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
@@ -24,6 +25,66 @@
         private DataContextLocal db = new DataContextLocal();
         private Response response = new Response();
         private string errorMessages = string.Empty;
+
+        [HttpPost]
+        [Route("LoginFacebook")]
+        public async Task<IHttpActionResult> LoginFacebook(FacebookResponse _profile)
+        {
+            try
+            {
+                var user = await db.Users.Where(u => u.Email == _profile.Id).FirstOrDefaultAsync();
+                if (user == null)
+                {
+                    user = new User
+                    {
+                        Email = _profile.Id,
+                        FirstName = _profile.FirstName,
+                        LastName = _profile.LastName,
+                        ImagePath = _profile.Picture.Data.Url,
+                        UserTypeId = 2,
+                        Telephone = "...",
+                    };
+
+                    db.Users.Add(user);
+                    UsersHelper.CreateUserASP(_profile.Id, "User", _profile.Id);
+                }
+                else
+                {
+                    user.FirstName = _profile.FirstName;
+                    user.LastName = _profile.LastName;
+                    user.ImagePath = _profile.Picture.Data.Url;
+                    db.Entry(user).State = EntityState.Modified;
+                }
+
+                response = await DbHelper.SaveChangeDB(db);
+                if (!response.IsSuccess)
+                {
+                    errorMessages = string.Format("Error: {0}", response.Message);
+                    ModelState.AddModelError(string.Empty, errorMessages);
+                    return BadRequest(errorMessages);
+                }
+                return Ok(true);
+            }
+            catch (DbEntityValidationException e)
+            {
+                foreach (var eve in e.EntityValidationErrors)
+                {
+                    errorMessages = string.Format("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                    foreach (var ve in eve.ValidationErrors)
+                    {
+                        errorMessages += string.Format("\n- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage);
+                    }
+                }
+
+                return BadRequest(errorMessages);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
         [HttpPost]
         [Route("PasswordRecovery")]
