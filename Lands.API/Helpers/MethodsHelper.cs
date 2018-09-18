@@ -36,6 +36,11 @@
             }
         }
 
+        public static string GetUrlCantv()
+        {
+            return "http://www.cantv.com.ve/seccion.asp?pid=1&sid=450";
+        }
+
         private static int CreateStatusMatchByName(string statusMatchName, DataContextLocal dbLocal)
         {
             try
