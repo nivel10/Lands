@@ -274,16 +274,68 @@
                             }
                             return Ok(servicesVzLaCne);
                         }
+                        else
+                        {
+                            listDataB = listDataA[0].Descendants("td")
+                                .Where(node => node.GetAttributeValue("colspan", "")
+                                .Equals("3")).ToList();
+
+                            foreach (var lisItemDataB in listDataB)
+                            {
+                                if (!string.IsNullOrEmpty(lisItemDataB.InnerText))
+                                {
+                                    servicesVzLaCne.Descripcion += lisItemDataB.InnerText + Char.ConvertFromUtf32(13);
+                                }
+                            }
+                            servicesVzLaCne.Error = true;
+                            ModelState.AddModelError(string.Empty, servicesVzLaCne.Descripcion);
+                            return Ok(servicesVzLaCne);
+                        }
                         //}
 
                         //    lnAux001++;
                         //}
                     }
+                    else
+                    {
+                        //  Get error consult
+                        listDataA = htmlDocument.DocumentNode.Descendants("table")
+                            .Where(node => node.GetAttributeValue("align", "")
+                            .Equals("center")).ToList();
+
+                        foreach (var listItemA in listDataA)
+                        {
+                            listDataB = listItemA.Descendants("td")
+                                .ToList();
+
+                            if (listDataB.Count > 0)
+                            {
+                                servicesVzLaCne.Descripcion += listDataB[0].InnerText + Char.ConvertFromUtf32(13);
+                            }
+                            
+                            //  lcAux001 = listItemA.InnerText;
+                        }
+                        servicesVzLaCne.Error = true;
+                        ModelState.AddModelError(string.Empty, servicesVzLaCne.Descripcion);
+                        return Ok(servicesVzLaCne);
+                    }
                 }
 
-                ModelState.AddModelError(string.Empty, "No data found...!!!");
                 servicesVzLaCne.Error = true;
-                servicesVzLaCne.Descripcion = "No data found...!!!";
+                if (iRestResponse.ErrorException == null)
+                {
+                    ModelState.AddModelError(string.Empty, "No data found...!!!");
+                    servicesVzLaCne.Descripcion = "No data found...!!!";
+                }
+                else
+                {
+                    //  Get error request
+                    servicesVzLaCne.Descripcion = iRestResponse.ErrorException.Message + Char.ConvertFromUtf32(13);
+                    if(iRestResponse.ErrorException.InnerException != null)
+                    {
+                        servicesVzLaCne.Descripcion += iRestResponse.ErrorException.InnerException.Message;
+                    }
+                }
                 return Ok(servicesVzLaCne);
             }
             catch (Exception ex)
