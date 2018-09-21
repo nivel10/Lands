@@ -36,11 +36,6 @@
             }
         }
 
-        public static string GetUrlCantv()
-        {
-            return "http://www.cantv.com.ve/seccion.asp?pid=1&sid=450";
-        }
-
         private static int CreateStatusMatchByName(string statusMatchName, DataContextLocal dbLocal)
         {
             try
@@ -85,5 +80,24 @@
         {
             return "~/Content/Users/Images/";
         }
+
+        #region Url Services
+
+        public static string GetUrlCantv()
+        {
+            return "http://www.cantv.com.ve/seccion.asp?pid=1&sid=450";
+        }
+
+        public static string GetUrlCne()
+        {
+            return "http://www.cne.gob.ve/web/registro_electoral/ce.php";
+        }
+
+        public static string GetUlrCorpoElect()
+        {
+            return "http://cobrosweb.cadafe.com.ve/enlinea/consultadeuda.aspx";
+        }
+
+        #endregion Url Services
     }
 }

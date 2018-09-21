@@ -29,8 +29,17 @@
         private string lcAux001;
         private int lnAux001;
 
+        private string simboloVariable;
+        private string fechaEmision;
+        private string fechaVencimiento;
+        private string importeEnergia;
+        private string importeAseo;
+        private string totalFactura;
+
         private ServicesVzLaCantv servicesVzLaCantv;
         private ServicesVzLaCne servicesVzLaCne;
+        private ServicesVzLaCorpoElect servicesVzLaCorpoElect;
+        private List<ServicesVzLaCorpoElectDetails> servicesVzLaCorpoElectDetails;
 
         #endregion Attributes
 
@@ -46,27 +55,27 @@
                 url = new Uri(MethodsHelper.GetUrlCantv());
                 value = $"sarea={_numberCode}&stelefono={_numberPhone}";
                 restClient = new RestClient(url);
-                restRequest = new RestRequest(Method.POST);
-                restRequest.AddHeader(
+                this.restRequest = new RestRequest(Method.POST);
+                this.restRequest.AddHeader(
                     "cache-control",
                     "no-cache");
-                restRequest.AddHeader(
+                this.restRequest.AddHeader(
                     "content-type",
                     "application/x-www-form-urlencoded");
-                restRequest.AddParameter(
+                this.restRequest.AddParameter(
                     "application/x-www-form-urlencoded",
                     value,
                     ParameterType.RequestBody);
-                iRestResponse = restClient.Execute(restRequest);
+                this.iRestResponse = restClient.Execute(this.restRequest);
                 servicesVzLaCantv = new ServicesVzLaCantv();
 
-                if (iRestResponse != null ||
-                    !string.IsNullOrEmpty(iRestResponse.Content))
+                if (this.iRestResponse != null ||
+                    !string.IsNullOrEmpty(this.iRestResponse.Content))
                 {
-                    htmlDocument = new HtmlDocument();
-                    htmlDocument.LoadHtml(iRestResponse.Content);
+                    this.htmlDocument = new HtmlDocument();
+                    this.htmlDocument.LoadHtml(this.iRestResponse.Content);
 
-                    listDataError = htmlDocument.DocumentNode.Descendants("table")
+                    listDataError = this.htmlDocument.DocumentNode.Descendants("table")
                         .Where(node => node.GetAttributeValue("width", "")
                         .Equals("350")).ToList();
 
@@ -74,28 +83,28 @@
                         .Where(lde => lde.InnerText.Trim().Contains("Numero invalido"))
                         .FirstOrDefault();
 
-                    listDataA = htmlDocument.DocumentNode.Descendants("body")
+                    this.listDataA = this.htmlDocument.DocumentNode.Descendants("body")
                         .Where(node => node.GetAttributeValue("table", "")
                         .Equals("")).ToList();
 
                     lcAux001 = string.Empty;
                     lnAux001 = 0;
 
-                    if (listDataA.Count > 0)
+                    if (this.listDataA.Count > 0)
                     {
-                        foreach (var listItemA in listDataA)
+                        foreach (var listItemA in this.listDataA)
                         {
                             if (lnAux001 == 1)
                             {
-                                listDataB = listItemA.Descendants("font")
+                                this.listDataB = listItemA.Descendants("font")
                                     .Where(node => node.GetAttributeValue("face", "")
                                     .Equals("Verdana, Arial, Helvetica, sans-serif")).ToList();
 
-                                if (listDataB.Count > 0)
+                                if (this.listDataB.Count > 0)
                                 {
                                     lnAux001 = 0;
 
-                                    foreach (var listItemB in listDataB)
+                                    foreach (var listItemB in this.listDataB)
                                     {
                                         if ((lnAux001 % 2) == 0)
                                         {
@@ -170,38 +179,39 @@
             try
             {
                 value = $"?nacionalidad={_nationalityUser}&cedula={_numberUser}";
-                url = new Uri($"http://www.cne.gob.ve/web/registro_electoral/ce.php{value}");
-                restClient = new RestClient(url);
-                restRequest = new RestRequest(Method.POST);
-                restRequest.AddHeader(
+                //  url = new Uri($"http://www.cne.gob.ve/web/registro_electoral/ce.php{value}");
+                this.url = new Uri($"{MethodsHelper.GetUrlCne()}{value}");
+                this.restClient = new RestClient(url);
+                this.restRequest = new RestRequest(Method.POST);
+                this.restRequest.AddHeader(
                     "cache-control",
                     "no-cache");
-                iRestResponse = restClient.Execute(restRequest);
+                this.iRestResponse = restClient.Execute(this.restRequest);
                 servicesVzLaCne = new ServicesVzLaCne();
 
-                if (iRestResponse != null &&
-                    !string.IsNullOrEmpty(iRestResponse.Content))
+                if (this.iRestResponse != null &&
+                    !string.IsNullOrEmpty(this.iRestResponse.Content))
                 {
-                    htmlDocument = new HtmlDocument();
-                    htmlDocument.LoadHtml(iRestResponse.Content);
+                    this.htmlDocument = new HtmlDocument();
+                    this.htmlDocument.LoadHtml(this.iRestResponse.Content);
 
                     //  Get data primary
-                    listDataA = htmlDocument.DocumentNode.Descendants("table")
+                    this.listDataA = this.htmlDocument.DocumentNode.Descendants("table")
                         .Where(node => node.GetAttributeValue("cellpadding", "")
                         .Equals("2")).ToList();
 
                     //  Get data secundary
-                    listDataB = htmlDocument.DocumentNode.Descendants("td")
+                    this.listDataB = this.htmlDocument.DocumentNode.Descendants("td")
                         .Where(node => node.GetAttributeValue("align", "")
                         .Equals("center")).ToList();
 
-                    if (listDataB.Count > 0)
+                    if (this.listDataB.Count > 0)
                     {
-                        foreach (var listItemB in listDataB)
+                        foreach (var listItemB in this.listDataB)
                         {
-                            listDataC = listItemB.Descendants("b")
+                            this.listDataC = listItemB.Descendants("b")
                                 .ToList();
-                            if (listDataC.Count > 0 && 
+                            if (this.listDataC.Count > 0 &&
                                 !listItemB.InnerText.Contains("DATOS DEL ELECTOR") &&
                                 !listItemB.InnerText.Contains("Conoce los Miembros de Mesa de tu Centro de Votación."))
                             {
@@ -217,21 +227,21 @@
                     lcAux001 = string.Empty;
                     lnAux001 = 0;
 
-                    if (listDataA.Count > 0)
+                    if (this.listDataA.Count > 0)
                     {
-                        //foreach (var lustItemA in listDataA)
+                        //foreach (var lustItemA in this.listDataA)
                         //{
                         //if(lnAux001 == 0)
                         //{
-                        listDataC = listDataA[0].Descendants("td")
+                        this.listDataC = this.listDataA[0].Descendants("td")
                             .Where(node => node.GetAttributeValue("align", "")
                             .Equals("left")).ToList();
 
-                        if (listDataC.Count > 0)
+                        if (this.listDataC.Count > 0)
                         {
                             lnAux001 = 0;
 
-                            foreach (var listItemC in listDataC)
+                            foreach (var listItemC in this.listDataC)
                             {
                                 if ((lnAux001 % 2) == 0)
                                 {
@@ -276,11 +286,11 @@
                         }
                         else
                         {
-                            listDataB = listDataA[0].Descendants("td")
+                            this.listDataB = this.listDataA[0].Descendants("td")
                                 .Where(node => node.GetAttributeValue("colspan", "")
                                 .Equals("3")).ToList();
 
-                            foreach (var lisItemDataB in listDataB)
+                            foreach (var lisItemDataB in this.listDataB)
                             {
                                 if (!string.IsNullOrEmpty(lisItemDataB.InnerText))
                                 {
@@ -299,20 +309,20 @@
                     else
                     {
                         //  Get error consult
-                        listDataA = htmlDocument.DocumentNode.Descendants("table")
+                        this.listDataA = this.htmlDocument.DocumentNode.Descendants("table")
                             .Where(node => node.GetAttributeValue("align", "")
                             .Equals("center")).ToList();
 
-                        foreach (var listItemA in listDataA)
+                        foreach (var listItemA in this.listDataA)
                         {
-                            listDataB = listItemA.Descendants("td")
+                            this.listDataB = listItemA.Descendants("td")
                                 .ToList();
 
-                            if (listDataB.Count > 0)
+                            if (this.listDataB.Count > 0)
                             {
-                                servicesVzLaCne.Descripcion += listDataB[0].InnerText + Char.ConvertFromUtf32(13);
+                                servicesVzLaCne.Descripcion += this.listDataB[0].InnerText + Char.ConvertFromUtf32(13);
                             }
-                            
+
                             //  lcAux001 = listItemA.InnerText;
                         }
                         servicesVzLaCne.Error = true;
@@ -322,7 +332,7 @@
                 }
 
                 servicesVzLaCne.Error = true;
-                if (iRestResponse.ErrorException == null)
+                if (this.iRestResponse.ErrorException == null)
                 {
                     ModelState.AddModelError(string.Empty, "No data found...!!!");
                     servicesVzLaCne.Descripcion = "No data found...!!!";
@@ -330,10 +340,10 @@
                 else
                 {
                     //  Get error request
-                    servicesVzLaCne.Descripcion = iRestResponse.ErrorException.Message + Char.ConvertFromUtf32(13);
-                    if(iRestResponse.ErrorException.InnerException != null)
+                    servicesVzLaCne.Descripcion = this.iRestResponse.ErrorException.Message + Char.ConvertFromUtf32(13);
+                    if (this.iRestResponse.ErrorException.InnerException != null)
                     {
-                        servicesVzLaCne.Descripcion += iRestResponse.ErrorException.InnerException.Message;
+                        servicesVzLaCne.Descripcion += this.iRestResponse.ErrorException.InnerException.Message;
                     }
                 }
                 return Ok(servicesVzLaCne);
@@ -345,6 +355,176 @@
                 servicesVzLaCne.Descripcion = ex.Message;
                 return Ok(servicesVzLaCne);
             }
+        }
+
+        [Route("GetCorpoElectData")]
+        public IHttpActionResult GetCorpoElec(string _userNic)
+        {
+            try
+            {
+                value = $"?nic={_userNic}";
+                url = new Uri($"{MethodsHelper.GetUlrCorpoElect()}{value}");
+                restClient = new RestClient(url);
+                this.restRequest = new RestRequest(Method.POST);
+                this.restRequest.AddHeader(
+                    "cache-control",
+                    "no-cache");
+                this.iRestResponse = restClient.Execute(this.restRequest);
+
+                servicesVzLaCorpoElect = new ServicesVzLaCorpoElect();
+
+                if (this.iRestResponse.ErrorException == null)
+                {
+                    if (this.iRestResponse != null &&
+                        !string.IsNullOrEmpty(this.iRestResponse.Content))
+                    {
+                        this.htmlDocument = new HtmlDocument();
+                        this.htmlDocument.LoadHtml(this.iRestResponse.Content);
+
+                        //  Get the header data
+                        this.listDataA = this.htmlDocument.DocumentNode.Descendants("td")
+                            .ToList();
+
+                        foreach (var listItemDataA in this.listDataA)
+                        {
+                            if (listItemDataA.InnerText.Contains("NIC:"))
+                            {
+                                this.listDataB = listItemDataA.DescendantsAndSelf("input")
+                                .Where(node => !string.IsNullOrWhiteSpace(node.Id) &&
+                                       node.Attributes["value"] != null)
+                                .ToList();
+
+                                servicesVzLaCorpoElect.NicUsuario = this.listDataB[0].Attributes["value"].Value;
+                            }
+
+                            if (listItemDataA.InnerText.Contains("USUARIO:"))
+                            {
+                                this.listDataB = listItemDataA.DescendantsAndSelf("input")
+                                .Where(node => !string.IsNullOrWhiteSpace(node.Id) &&
+                                       node.Attributes["value"] != null)
+                                .ToList();
+                                servicesVzLaCorpoElect.NombreUsuario = this.listDataB[0].Attributes["value"].Value;
+                            }
+
+                            if (listItemDataA.InnerText.Contains("DEUDA PENDIENTE DEL USUARIO"))
+                            {
+                                this.listDataB = listItemDataA.DescendantsAndSelf("input")
+                                    .Where(node => !string.IsNullOrWhiteSpace(node.Id) &&
+                                           node.Attributes["value"] != null)
+                                    .ToList();
+                                servicesVzLaCorpoElect.DeudaPendienteUsuario = this.listDataB[0].Attributes["value"].Value;
+                            }
+
+                            if (listItemDataA.InnerText.Contains("Deuda Vencida"))
+                            {
+                                this.listDataB = listItemDataA.DescendantsAndSelf("input")
+                                    .Where(node => !string.IsNullOrWhiteSpace(node.Id) &&
+                                           node.Attributes["value"] != null)
+                                           .ToList();
+                                servicesVzLaCorpoElect.DeudaVencidaUsuario = this.listDataB[0].Attributes["value"].Value;
+                            }
+                        }
+
+                        //  Get the details data
+                        this.listDataA = this.htmlDocument.DocumentNode.Descendants("td")
+                            .Where(node => node.GetAttributeValue("style", "")
+                            .Equals("HEIGHT: 71px"))
+                            .ToList();
+
+                        if (this.listDataA.Count > 0)
+                        {
+                            this.InitialFieldCorpoElectDetail();
+                            lcAux001 = string.Empty;
+                            lnAux001 = 0;
+                            servicesVzLaCorpoElectDetails = new List<ServicesVzLaCorpoElectDetails>();
+
+                            this.listDataB = this.listDataA[0].Descendants("td")
+                                .ToList();
+                            foreach (var listItemDataB in this.listDataB)
+                            {
+                                if (listItemDataB.InnerText.ToString() == "Total Factura")
+                                {
+                                    lcAux001 = listItemDataB.InnerText.ToString();
+                                }
+
+                                if (lcAux001 == listItemDataB.InnerText.ToString())
+                                {
+                                }
+                                else
+                                {
+                                    if (lcAux001 == "Total Factura")
+                                    {
+                                        switch (lnAux001)
+                                        {
+                                            case 0:
+                                                this.simboloVariable = listItemDataB.InnerText.Trim();
+                                                break;
+                                            case 1:
+                                                this.fechaEmision = listItemDataB.InnerText.Trim();
+                                                break;
+                                            case 2:
+                                                this.fechaVencimiento = listItemDataB.InnerText.Trim();
+                                                break;
+                                            case 3:
+                                                this.importeEnergia = listItemDataB.InnerText.Trim();
+                                                break;
+                                            case 4:
+                                                this.importeAseo = listItemDataB.InnerText.Trim();
+                                                break;
+                                            case 5:
+                                                this.totalFactura = listItemDataB.InnerText.Trim();
+
+                                                this.servicesVzLaCorpoElectDetails.Add(
+                                                    new ServicesVzLaCorpoElectDetails
+                                                    {
+                                                        FechaEmision = this.fechaEmision,
+                                                        FechaVencimiento = this.fechaVencimiento,
+                                                        ImporteAseo = this.importeAseo,
+                                                        ImporteEnergia = this.importeEnergia,
+                                                        SimboloVariable = this.simboloVariable,
+                                                        TotalAseo = this.importeAseo,
+                                                    });
+                                                lnAux001 = -1;
+                                                this.InitialFieldCorpoElectDetail();
+                                                break;
+                                        }
+
+                                        lnAux001++;
+                                    }
+                                }
+                            }
+                            servicesVzLaCorpoElect.Details = this.servicesVzLaCorpoElectDetails;
+                        }
+                    }
+                    else
+                    {
+                        //  Ojo aqui
+                    }
+                }
+                else
+                {
+                    //  Ojo aqui
+                }
+
+                return Ok(servicesVzLaCorpoElect);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                servicesVzLaCorpoElect.Error = true;
+                servicesVzLaCorpoElect.Descripcion = ex.Message;
+                return Ok(servicesVzLaCorpoElect);
+            }
+        }
+
+        private void InitialFieldCorpoElectDetail()
+        {
+            this.fechaEmision = string.Empty;
+            this.fechaVencimiento = string.Empty;
+            this.importeAseo = string.Empty;
+            this.importeEnergia = string.Empty;
+            this.simboloVariable = string.Empty;
+            this.importeAseo = string.Empty;
         }
 
         protected override void Dispose(bool disposing)

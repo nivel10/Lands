@@ -260,6 +260,8 @@
     <Compile Include="Models\ServicesVzLa\ServicesVzLaCantvDataResponse.cs" />
     <Compile Include="Models\ServicesVzLa\ServicesVzLaCne.cs" />
     <Compile Include="Models\ServicesVzLa\ServicesVzLaCneIvssDataResponse.cs" />
+    <Compile Include="Models\ServicesVzLa\ServicesVzLaCorpoElect.cs" />
+    <Compile Include="Models\ServicesVzLa\ServicesVzLaCorpoElectDetails.cs" />
     <Compile Include="Models\ServicesVzLa\ServicesVzLaNationalityResponse.cs" />
     <Compile Include="Models\ServicesVzLa\ServicesVzLaUserEdit.cs" />
     <Compile Include="Models\ServicesVzLa\ServicesVzLaUserResponse.cs" />
