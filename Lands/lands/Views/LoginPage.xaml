@@ -17,7 +17,7 @@
 
                 <Image Source="LogoUno.png"
                        WidthRequest="150"/>
-
+                
                 <Grid Margin="10,0"
                       VerticalOptions="CenterAndExpand">
                     <Grid.ColumnDefinitions>
