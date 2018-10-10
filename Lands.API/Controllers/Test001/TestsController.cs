@@ -127,6 +127,46 @@
             }
         }
 
+        [HttpPost]
+        [Route("GetCompanyConnection")]
+        public async Task<IHttpActionResult> GetCompanyConnection(
+            object _form)
+        {
+            try {
+                dynamic objectJason = _form;
+
+                string companyId = objectJason.CompanyId.Value;
+                var response = await DbHelper.GetDataTableGeneric(
+                    "*", 
+                    "SYS.DATABASES", $"NAME = '{companyId}' AND STATE = 0", 
+                    "CompanyConnection");
+
+                if (!response.IsSuccess)
+                {
+                    return BadRequest(response.Message);
+                }
+
+                var companyCoonection = (DataTable)response.Result;
+                if (companyCoonection.Rows.Count > 0)
+                {
+                    if (string.IsNullOrEmpty(companyCoonection.Rows[0][0].ToString().Trim()))
+                    {
+                        return BadRequest();
+                    }
+
+                    return Ok(companyCoonection.Rows[0][0].ToString().Trim());
+                }
+                else
+                {
+                    return BadRequest("Error: The database is not exist...!!!");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         #region Methods
 
         private List<Employee> LoadDataListEmployee(DataTable _sqlDataTable)
