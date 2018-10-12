@@ -186,6 +186,51 @@
             }
         }
 
+        public static async Task<Response> GetDataTableGeneric(
+            string _sqlQuery, 
+            string _dataTableName)
+        {
+            try
+            {
+                using (SqlConnection sqlConnection = new SqlConnection(GetConnectionString()))
+                {
+                    using (SqlCommand sqlCommand = new SqlCommand())
+                    {
+                        sqlCommand.Connection = sqlConnection;
+                        sqlCommand.CommandType = CommandType.Text;
+                        sqlCommand.CommandText = _sqlQuery;
+
+                        using (SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(sqlCommand))
+                        {
+                            await sqlConnection.OpenAsync();
+
+                            using (DataTable dataTable = new DataTable(_dataTableName))
+                            {
+                                sqlDataAdapter.Fill(dataTable);
+                                sqlConnection.Close();
+                                sqlConnection.Dispose();
+
+                                return new Response
+                                {
+                                    IsSuccess = true,
+                                    Message = "Process is ok...!",
+                                    Result = dataTable,
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new Response
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                };
+            }
+        }
+
         private static string GetConnectionString()
         {
             return ConfigurationManager.ConnectionStrings["TestsConnection"].ToString();

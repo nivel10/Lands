@@ -269,6 +269,7 @@
     <Compile Include="Models\ServicesVzLa\ServicesVzLaUserResponse.cs" />
     <Compile Include="Models\ServicesVzLa\ServicesVzLaZoomDataResponse.cs" />
     <Compile Include="Models\Soccer\MatchResponse.cs" />
+    <Compile Include="Models\Test001\CustomerStatementAccount.cs" />
     <Compile Include="Models\Test001\Employee.cs" />
     <Compile Include="Models\Test001\Empresa.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

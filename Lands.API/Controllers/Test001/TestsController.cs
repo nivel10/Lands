@@ -2,13 +2,10 @@
 {
     using Lands.API.Helpers;
     using Lands.API.Models.Test001;
-    using Lands.Domain.Others;
     using Newtonsoft.Json.Linq;
     using System;
     using System.Collections.Generic;
     using System.Data;
-    using System.Data.Odbc;
-    using System.IO;
     using System.Threading.Tasks;
     using System.Web.Http;
 
@@ -71,14 +68,14 @@
                     employee = this.LoadDataEmployee((DataTable)response.Result);
                     if (string.IsNullOrEmpty(employee.Employee_i))
                     {
-                         employee.Message = "User or password wrong, please check...!!!";
+                        employee.Message = "User or password wrong, please check...!!!";
                         return BadRequest(employee.Message);
                         //  return Ok(employee);
                     }
 
                     response = await DbHelper.GetDataTableGeneric(
-                        userPassword, 
-                        employee.Prioridad, 
+                        userPassword,
+                        employee.Prioridad,
                         employee.Mapa,
                         "Employee");
 
@@ -132,13 +129,14 @@
         public async Task<IHttpActionResult> GetCompanyConnection(
             object _form)
         {
-            try {
+            try
+            {
                 dynamic objectJason = _form;
 
                 string companyId = objectJason.CompanyId.Value;
                 var response = await DbHelper.GetDataTableGeneric(
-                    "*", 
-                    "SYS.DATABASES", $"NAME = '{companyId}' AND STATE = 0", 
+                    "*",
+                    "SYS.DATABASES", $"NAME = '{companyId}' AND STATE = 0",
                     "CompanyConnection");
 
                 if (!response.IsSuccess)
@@ -167,6 +165,59 @@
             }
         }
 
+        [HttpPost]
+        [Route("GetCustomerStatementAccount")]
+        public async Task<IHttpActionResult> GetCustomerStatementAccount(
+            object _form)
+        {
+            var ListCustomerStatementAccount =
+                new List<CustomerStatementAccount>();
+            try
+            {
+                #region Data Json
+
+                dynamic JsonForm = _form;
+                string fromCustomerId = JsonForm.FromCustomerId.Value;
+                string toCustomerId = JsonForm.ToCustomerId.Value;
+                DateTime fromDate = DateTime.Parse(JsonForm.FromDate.Value);
+                DateTime toDate = DateTime.Parse(JsonForm.ToDate.Value);
+                string documentState = JsonForm.DocumentState.Value;
+                string dataBaseName = JsonForm.DataBaseName.Value;
+
+                #endregion Data Jason
+
+                var response = await DbHelper.GetDataTableGeneric(
+                    this.GetQueryCustomerStatement(
+                        fromCustomerId,
+                        toCustomerId,
+                        fromDate,
+                        toDate,
+                        documentState,
+                        dataBaseName),
+                    "CustomerStatementAccount");
+                if (!response.IsSuccess)
+                {
+                    return BadRequest(response.Message);
+                }
+
+                var dataTableCustomerStatementAccount = (DataTable)response.Result;
+                if (dataTableCustomerStatementAccount.Rows.Count <= 0)
+                {
+                    return Ok("Data not found...!!!");
+                }
+
+                //  Load data Customer Statement Account
+                ListCustomerStatementAccount =
+                    this.LoadDataCustomerStatementAccount(dataTableCustomerStatementAccount);
+
+                return Ok(ListCustomerStatementAccount);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         #region Methods
 
         private List<Employee> LoadDataListEmployee(DataTable _sqlDataTable)
@@ -182,8 +233,8 @@
                     Camb_sucu = bool.Parse(row["Camb_sucu"].ToString()),
                     Employee_i = row["Employee_i"].ToString().Trim(),
                     Empresas = row["Empresas"].ToString().Trim(),
-                    EmpresasSinAcceso = string.IsNullOrEmpty(row["Empresas"].ToString().Trim()) ? 
-                        null 
+                    EmpresasSinAcceso = string.IsNullOrEmpty(row["Empresas"].ToString().Trim()) ?
+                        null
                             : this.GetListEmpresas(row["Empresas"].ToString().Trim()),
                     Estado = row["Estado"].ToString().Trim(),
                     Fec_prox = DateTime.Parse(
@@ -229,7 +280,7 @@
                 employee.Employee_i = row["Employee_i"].ToString().Trim();
                 employee.Empresas = row["Empresas"].ToString().Trim();
                 employee.EmpresasSinAcceso = string.IsNullOrEmpty(row["Empresas"].ToString().Trim()) ?
-                    null : 
+                    null :
                         this.GetListEmpresas(row["Empresas"].ToString().Trim());
                 employee.Estado = row["Estado"].ToString().Trim();
                 employee.Fec_prox = DateTime.Parse(
@@ -279,7 +330,7 @@
                         });
                         empresa = string.Empty;
                     }
-                    else if (_empresas.Substring(i, 1) != "[" && 
+                    else if (_empresas.Substring(i, 1) != "[" &&
                         !string.IsNullOrEmpty(_empresas.Substring(i, 1)))
                     {
                         empresa += _empresas.Substring(i, 1);
@@ -291,6 +342,126 @@
             {
                 return new List<Empresa>();
             }
+        }
+
+        private string GetQueryCustomerStatement(
+            string _fromCustomerId,
+            string _toCustmerId,
+            DateTime _fromDate,
+            DateTime _toDate,
+            string _documentSate,
+            string _dataBaseName)
+        {
+            var sqlQuery = string.Empty;
+            var _fromDateLocal = _fromDate.ToShortDateString().Trim();
+            var _toDateLocal = _toDate.ToShortDateString().Trim();
+
+            sqlQuery = $"USE [{_dataBaseName}]" + char.ConvertFromUtf32(13);
+            sqlQuery += " " + Char.ConvertFromUtf32(13);
+
+            sqlQuery += "Declare" + Char.ConvertFromUtf32(13);
+            sqlQuery += " @rifEmpresa nVarchar(20), " + Char.ConvertFromUtf32(13);
+            sqlQuery += " @codigoEmpresa nVarChar(10), " + Char.ConvertFromUtf32(13);
+            sqlQuery += " @nombreEmpresa nVarChar(100) " + Char.ConvertFromUtf32(13);
+            sqlQuery += " " + Char.ConvertFromUtf32(13);
+            sqlQuery += "Set @rifEmpresa = (SELECT TEMP_CHAR1 FROM PAR_EMP) " + Char.ConvertFromUtf32(13);
+            sqlQuery += "Set @codigoEmpresa = (SELECT TEMP_CHAR2 FROM PAR_EMP) " + Char.ConvertFromUtf32(13);
+            sqlQuery += "Set @nombreEmpresa = (SELECT TEMP_CHAR3 + '' + TEMP_CHAR4 FROM PAR_EMP) " + Char.ConvertFromUtf32(13);
+            sqlQuery += " " + Char.ConvertFromUtf32(13);
+            sqlQuery += "SELECT @codigoEmpresa AS cCodEmpresa, " + Char.ConvertFromUtf32(13);
+            sqlQuery += "@rifEmpresa AS cRifEmpresa, " + Char.ConvertFromUtf32(13);
+            sqlQuery += "@nombreEmpresa AS cNomEmpresa, " + Char.ConvertFromUtf32(13);
+            sqlQuery += "A.TIPO_DOC, A.NRO_DOC, A.FEC_EMIS, A.FEC_VENC, " + Char.ConvertFromUtf32(13);
+
+            sqlQuery += "CASE " + Char.ConvertFromUtf32(13);
+            sqlQuery += "    WHEN DATEDIFF(DD, A.FEC_VENC, GETDATE()) < 0 THEN " + Char.ConvertFromUtf32(13);
+            sqlQuery += "        (DATEDIFF(DD, A.FEC_VENC, GETDATE()) * -1) " + Char.ConvertFromUtf32(13);
+            sqlQuery += "    WHEN DATEDIFF(DD, A.FEC_VENC, GETDATE()) = 0 THEN " + Char.ConvertFromUtf32(13);
+            sqlQuery += "        DATEDIFF(DD, A.FEC_VENC, GETDATE()) " + Char.ConvertFromUtf32(13);
+            sqlQuery += "    ELSE " + Char.ConvertFromUtf32(13);
+            sqlQuery += "        0 " + Char.ConvertFromUtf32(13);
+            sqlQuery += "END AS nDiaPorVencer, " + Char.ConvertFromUtf32(13);
+
+            sqlQuery += "CASE " + Char.ConvertFromUtf32(13);
+            sqlQuery += "    WHEN DATEDIFF(DD, A.FEC_VENC, GETDATE()) > 0 THEN " + Char.ConvertFromUtf32(13);
+            sqlQuery += "        DATEDIFF(DD, A.FEC_VENC, GETDATE()) " + Char.ConvertFromUtf32(13);
+            sqlQuery += "    ELSE " + Char.ConvertFromUtf32(13);
+            sqlQuery += "        0 " + Char.ConvertFromUtf32(13);
+            sqlQuery += "END AS nDiaVencido, A.OBSERVA, A.CO_VEN, B.VEN_DES, " + Char.ConvertFromUtf32(13);
+
+            sqlQuery += "CASE " + Char.ConvertFromUtf32(13);
+            sqlQuery += "    WHEN A.TIPO_DOC = 'ADEL' OR A.TIPO_DOC LIKE '%AJN%' THEN " + Char.ConvertFromUtf32(13);
+            sqlQuery += "        A.MONTO_NET * -1 " + Char.ConvertFromUtf32(13);
+            sqlQuery += "    ELSE " + Char.ConvertFromUtf32(13);
+            sqlQuery += "        A.MONTO_NET " + Char.ConvertFromUtf32(13);
+            sqlQuery += "    END AS MONTO_NET, " + Char.ConvertFromUtf32(13);
+
+            sqlQuery += "CASE " + Char.ConvertFromUtf32(13);
+            sqlQuery += "    WHEN A.TIPO_DOC = 'ADEL' OR A.TIPO_DOC LIKE '%AJN%' THEN " + Char.ConvertFromUtf32(13);
+            sqlQuery += "        A.SALDO * -1 " + Char.ConvertFromUtf32(13);
+            sqlQuery += "    ELSE " + Char.ConvertFromUtf32(13);
+            sqlQuery += "        A.SALDO " + Char.ConvertFromUtf32(13);
+            sqlQuery += "END AS SALDO, A.CO_CLI, C.CLI_DES, C.RESPONS, C.EMAIL, C.CONTRIBU_E " + Char.ConvertFromUtf32(13);
+
+            sqlQuery += "FROM DOCUM_CC AS A " + Char.ConvertFromUtf32(13);
+            sqlQuery += "INNER JOIN VENDEDOR AS B ON A.CO_VEN = B.CO_VEN " + Char.ConvertFromUtf32(13);
+            sqlQuery += "INNER JOIN CLIENTES AS C ON A.CO_CLI = C.CO_CLI " + Char.ConvertFromUtf32(13);
+            sqlQuery += "WHERE A.SALDO > 0.00 " + Char.ConvertFromUtf32(13);
+
+            if (!string.IsNullOrEmpty(_fromCustomerId) && !string.IsNullOrEmpty(_toCustmerId))
+            {
+                sqlQuery += $"AND A.CO_CLI BETWEEN '{_fromCustomerId.Replace("'", "''")}' AND ";
+                sqlQuery += $"'{_toCustmerId.Replace("'", "''")}' " + Char.ConvertFromUtf32(13);
+            }
+
+            if (!string.IsNullOrEmpty(_fromDateLocal) && !string.IsNullOrEmpty(_toDateLocal))
+            {
+                sqlQuery += $"AND A.FEC_EMIS BETWEEN CONVERT(DATETIME, '{_fromDateLocal}', 104) AND ";
+                sqlQuery += $"CONVERT(DATETIME, '{_toDateLocal}', 104) " + Char.ConvertFromUtf32(13);
+            }
+
+            if (!string.IsNullOrEmpty(_documentSate))
+            {
+                sqlQuery += $"AND A.TIPO_DOC = '{_fromDateLocal.Replace("'", "''")}' " + Char.ConvertFromUtf32(13);
+            }
+
+            sqlQuery += "ORDER BY A.CO_CLI, A.FEC_EMIS " + Char.ConvertFromUtf32(13);
+
+            return sqlQuery;
+        }
+
+        private List<CustomerStatementAccount> LoadDataCustomerStatementAccount(
+            DataTable _dataTableCustomerStatementAccount)
+        {
+            var listCustomerStatementAccount = new List<CustomerStatementAccount>();
+
+            foreach (DataRow row in _dataTableCustomerStatementAccount.Rows)
+            {
+                listCustomerStatementAccount.Add(new CustomerStatementAccount
+                {
+                    Balance = decimal.Parse(row["Saldo"].ToString().Trim()),
+                    CompanyDescription = row["cNomEmpresa"].ToString().Trim(),
+                    CompanyId = row["cCodEmpresa"].ToString().Trim(),
+                    CompanyRif = row["cRifEmpresa"].ToString().Trim(),
+                    ContactPerson = row["RESPONS"].ToString().Trim(),
+                    CustomerDescription = row["CLI_DES"].ToString().Trim(),
+                    CustomerEmail = row["EMAIL"].ToString().Trim(),
+                    CustomerId = row["CO_CLI"].ToString().Trim(),
+                    DocumentDaysToCome = int.Parse(row["nDiaPorVencer"].ToString().Trim()),
+                    DocumentDescription = row["OBSERVA"].ToString().Trim(),
+                    DocumentEmissionDate = DateTime.Parse(row["FEC_EMIS"].ToString().Trim()),
+                    DocumentExpirationDate = DateTime.Parse(row["FEC_VENC"].ToString().Trim()),
+                    DocumentExpiredDate = int.Parse(row["nDiaVencido"].ToString().Trim()),
+                    DocumentId = int.Parse(row["NRO_DOC"].ToString().Trim()),
+                    DocumentType = row["TIPO_DOC"].ToString().Trim(),
+                    IsTaxPayer = bool.Parse(row["CONTRIBU_E"].ToString().Trim()),
+                    NetAmount = decimal.Parse(row["MONTO_NET"].ToString().Trim()),
+                    SellerDescription = row["VEN_DES"].ToString().Trim(),
+                    SellerId = row["CO_VEN"].ToString().Trim(),
+                });
+            }
+
+            return listCustomerStatementAccount;
         }
 
         #endregion Methods
